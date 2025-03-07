@@ -52,3 +52,4 @@ cd MesaYa-Front
 npm install
 ### **4️⃣ Correr el proyecto**
 npm run dev
+s

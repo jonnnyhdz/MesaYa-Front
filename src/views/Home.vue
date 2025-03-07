@@ -7,7 +7,7 @@
         Este es un ejemplo básico usando de prueba para subir el repo.
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        ¡Haz clic aquí!
+        ¡Haz clic aquí!!!
       </button>
     </div>
   </div>

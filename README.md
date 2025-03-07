@@ -1,40 +1,54 @@
-# MesaYa
+# MesaYa - Front
 
-This template should help get you started developing with Vue 3 in Vite.
+## 📌 Título del Proyecto
+**MesaYa** - Plataforma integral para la gestión de clientes en restaurantes.
 
-## Recommended IDE Setup
+## 📖 Problemática
+En la actualidad, muchos restaurantes enfrentan dificultades en la gestión de reservas y la actualización de menús, lo que genera una experiencia fragmentada tanto para clientes como para administradores. MesaYa surge como una solución digital innovadora para optimizar y automatizar estos procesos, permitiendo una gestión más eficiente y personalizada de los restaurantes.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 👥 Integrantes del Proyecto
+- **Garcia Canul Guillermo De Jesus** – 22393204
+- **Guzman Salazar Abelardo Geovani** – 22393178
+- **Hernandez Gonzalez Jonathan** – 22393180
+- **Lopez Rodriguez Cristian** – 22393175
+- **Tuz Carrillo Daniel Alejandro** – 22393190
 
-## Type Support for `.vue` Imports in TS
+## 🛠️ Tecnologías y Librerías Utilizadas
+### **Frontend (Vue.js)**
+- **Framework Principal:** Vue.js
+- **Estilos y UI:** Tailwind CSS
+- **Íconos:** FontAwesome, Heroicons
+- **Manejo de Estado:** Pinia
+- **Routing:** Vue Router
+- **Manejo de Fechas y Horarios:** Date-fns
+- **Validación de Formularios:** VeeValidate, Yup
+- **Alertas:** SweetAlert2
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### **Backend**
+- .NET Core con C# y SQL Server
+- Entity Framework Core (EF Core) con Migraciones
+- Arquitectura basada en API RESTful
 
-## Customize configuration
+### **Base de Datos**
+- SQL Server
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### **Autenticación y Seguridad**
+- JWT con Identity
 
-## Project Setup
+### **Notificaciones**
+- SMS: Twilio
+- Emails: SendGrid
 
-```sh
+### **Gestión de Versiones**
+- Git con GitHub
+
+## 🚀 Cómo Ejecutar el Proyecto
+
+### **1️⃣ Clonar el Repositorio**
+git clone https://github.com/jonnnyhdz/MesaYa-Front.git
+### **2️⃣ Acceder a la directiva del proyecto**
+cd MesaYa-Front
+### **3️⃣ Instalar las dependecias**
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
+### **4️⃣ Correr el proyecto**
 npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
-# MesaYa-Front

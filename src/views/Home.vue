@@ -5,6 +5,7 @@
     <div class="bg-white shadow-lg rounded-lg p-6 max-w-md text-center">
       <p class="text-gray-700 mb-4">
         Este es un ejemplo básico usando de prueba para subir el repo.
+        Cambiamos un poco el repositorio
       </p>
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         ¡Haz clic aquí!!!

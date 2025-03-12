@@ -4,9 +4,6 @@ import { RouterView } from 'vue-router'
 
 <template>
   <RouterView />
-  <h1>Hola</h1>
 </template>
 
-<style scoped>
-/* Agrega estilos si los necesitas */ 
-</style>
+<style scoped></style>

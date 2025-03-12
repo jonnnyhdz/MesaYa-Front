@@ -1,14 +1,54 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-    <h1 class="text-4xl font-bold text-blue-600 mb-6">¡Bienvenido a MesaYa!</h1>
+  <div class="min-h-screen">
+    <Navbar />
 
-    <div class="bg-white shadow-lg rounded-lg p-6 max-w-md text-center">
-      <p class="text-gray-700 mb-4">
-        Este es un ejemplo básico usando de prueba para subir el repo.
-      </p>
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        ¡Haz clic aquí!!!
-      </button>
+    <div id="home">
+      <HeroSection />
+    </div>
+
+    <div id="filters">
+      <FilterBar />
+    </div>
+
+    <div id="restaurants">
+      <RestaurantCarousel />
+    </div>
+
+    <div>
+      <TopRestaurantsCarousel />
+    </div>
+
+    <div id="categories">
+      <PopularCategories />
+    </div>
+
+    <div id="reviews">
+      <ReviewsCarousel />
+    </div>
+
+    <div>
+      <RestaurantsMap />
+    </div>
+
+    <div id="discounts">
+      <DiscountCarousel />
+    </div>
+
+    <div id="contact">
+      <Footer />
     </div>
   </div>
 </template>
+
+<script setup>
+import Navbar from '@/components/Navbar.vue'
+import HeroSection from '../components/home/HeroSection.vue'
+import FilterBar from '../components/home/FilterBar.vue'
+import RestaurantCarousel from '@/components/home/RestaurantCarousel.vue'
+import TopRestaurantsCarousel from '@/components/home/TopRestaurantsCarousel.vue'
+import Footer from '@/components/Footer.vue'
+import PopularCategories from '@/components/Home/PopularCategories.vue'
+import ReviewsCarousel from '@/components/Home/ReviewsCarousel.vue'
+import RestaurantsMap from '@/components/Home/RestaurantsMap.vue'
+import DiscountCarousel from '@/components/Home/DiscountCarousel.vue'
+</script>

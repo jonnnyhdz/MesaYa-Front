@@ -1,25 +1,39 @@
 import axios from 'axios'
+import { jwtDecode } from 'jwt-decode'
 
 const API_URL = 'https://localhost:7154/api'
 
+interface DecodedToken {
+  sub: string
+  email: string
+  jti: string
+  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string
+  exp: number
+}
+
 export const authService = {
-  //Esta funcion es para el login del usuario
   async login(email: string, password: string) {
     try {
       const response = await axios.post(`${API_URL}/Auth/login`, { email, password })
-      const { token, user } = response.data
+      const { token } = response.data
 
+      // Decodificamos el token
+      const decoded: DecodedToken = jwtDecode(token)
+      const userRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+      const userName = decoded.email // Aquí estás guardando el nombre
+
+      // Guardamos en LocalStorage
       localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('role', userRole)
+      localStorage.setItem('nombre', userName) // Guardamos el nombre del usuario
 
-      return { token, user }
+      return { token, role: userRole, nombre: userName }
     } catch (error) {
       console.error('Error en login:', error)
       throw new Error('Credenciales incorrectas o error en el servidor')
     }
   },
 
-  //Esta funcion es para el registro del usuario
   async register(name: string, email: string, password: string) {
     try {
       const response = await axios.post(`${API_URL}/Usuario/register`, {
@@ -36,15 +50,19 @@ export const authService = {
 
   logout() {
     localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    localStorage.removeItem('role')
+    localStorage.removeItem('nombre')
   },
 
   getToken() {
     return localStorage.getItem('token')
   },
 
-  getUser() {
-    const user = localStorage.getItem('user')
-    return user ? JSON.parse(user) : null
+  getRole() {
+    return localStorage.getItem('role')
+  },
+
+  getNombre() {
+    return localStorage.getItem('nombre')
   },
 }

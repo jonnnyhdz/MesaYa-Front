@@ -87,7 +87,6 @@ import { useAuthStore } from '@/stores/authStore'
 
 const email = ref('')
 const password = ref('')
-const showPassword = ref(false)
 const errorMessage = ref('')
 const loading = ref(false)
 const authStore = useAuthStore()
@@ -99,16 +98,23 @@ const login = async () => {
 
   try {
     await authStore.login(email.value, password.value)
-    router.push('/dashboard')
+    const role = authStore.role
+
+    // Redirigir según el rol
+    if (role === 'Admin') {
+      router.push('/dashboard-admin')
+    } else if (role === 'Usuario') {
+      router.push('/dashboard-usuario')
+    } else if (role === 'Hostess') {
+      router.push('/dashboard-hostess')
+    } else {
+      router.push('/')
+    }
   } catch (error) {
     errorMessage.value = error.message || 'Error al iniciar sesión'
   } finally {
     loading.value = false
   }
-}
-
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
 }
 
 const goToHome = () => {

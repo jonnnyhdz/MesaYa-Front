@@ -5,15 +5,17 @@ import type { IUser } from '../interfaces/UserInterface'
 
 export const useAuthStore = defineStore('auth', {
   state: (): IAuthState => ({
-    user: authService.getUser(),
     token: authService.getToken(),
+    role: authService.getRole(),
+    nombre: authService.getNombre(),
   }),
 
   actions: {
     async login(email: string, password: string) {
-      const { token, user } = await authService.login(email, password)
-      this.user = user as IUser
+      const { token, role, nombre } = await authService.login(email, password)
       this.token = token
+      this.role = role
+      this.nombre = nombre
     },
 
     async register(name: string, email: string, password: string) {
@@ -23,8 +25,9 @@ export const useAuthStore = defineStore('auth', {
 
     logout() {
       authService.logout()
-      this.user = null
       this.token = null
+      this.role = null
+      this.nombre = null
     },
   },
 })

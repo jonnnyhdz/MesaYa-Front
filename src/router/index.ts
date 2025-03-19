@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/Home.vue'
+import Home from '../views/Home.vue'
 import RestaurantDetails from '../views/RestaurantDetails.vue'
 import NotFound from '../views/NotFound.vue'
 import Login from '@/views/Auth/Login.vue'
@@ -9,6 +9,8 @@ import DashboardUsuario from '@/views/User/DashboardUsuario.vue'
 import DashboardHostess from '@/views/Hostess/DashboardHostess.vue'
 import Restaurantes from '@/views/Admin/Restaurantes.vue'
 import GestionUsuarios from '@/views/Admin/GestionUsuarios.vue'
+import CreateRestaurant from '@/views/Admin/CreateRestaurant.vue'
+import RestaurantDetail from '@/views/Admin/RestaurantDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +18,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: Home,
     },
     {
       path: '/restaurant/:id',
@@ -57,6 +59,18 @@ const router = createRouter({
       path: '/gestionUsers',
       name: 'gestiosUsers',
       component: GestionUsuarios,
+      meta: { requiresAuth: true, role: 'Admin' },
+    },
+    {
+      path: '/createRestaurant',
+      name: 'createRestaurant',
+      component: CreateRestaurant,
+      meta: { requiresAuth: true, role: 'Admin' },
+    },
+    {
+      path: '/restaurante/:id',
+      name: 'restautanDetails',
+      component: RestaurantDetail,
       meta: { requiresAuth: true, role: 'Admin' },
     },
 

@@ -1,33 +1,17 @@
 import axios from 'axios'
-import { authService } from './authService'
 
-const API_URL = 'http://localhost:5000/api/Usuario'
+const API_URL = 'https://localhost:7154/api'
 
 export const userService = {
-  async register(nombre: string, email: string, password: string) {
+  async getHostessUsers() {
     try {
-      const response = await axios.post(`${API_URL}/register`, {
-        nombre,
-        email,
-        password,
-      })
-      return response.data
-    } catch (error) {
-      console.error('Error en el registro:', error)
-      throw new Error('No se pudo registrar el usuario')
-    }
-  },
+      const response = await axios.get(`${API_URL}/Usuario/hostess`)
 
-  async getUserById(id: number) {
-    try {
-      const token = authService.getToken()
-      const response = await axios.get(`${API_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      return response.data
+      // ✅ Extraemos correctamente los usuarios de la clave "$values"
+      return response.data?.$values || []
     } catch (error) {
-      console.error('Error al obtener usuario:', error)
-      throw new Error('No se pudo obtener la información del usuario')
+      console.error('Error al obtener los usuarios Hostess:', error)
+      return []
     }
   },
 }

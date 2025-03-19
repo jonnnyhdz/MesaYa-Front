@@ -1,6 +1,6 @@
 <template>
   <div class="relative min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-40"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-teal-600 opacity-40"></div>
 
     <div
       class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-xl shadow-lg rounded-3xl p-10 w-full max-w-md transition-all duration-500"

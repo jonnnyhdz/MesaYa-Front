@@ -8,7 +8,6 @@
         Bienvenido a <span class="text-yellow-500">MesaYa</span>
       </h2>
       <p class="text-gray-600 dark:text-gray-400 text-center mt-2">Inicia sesión para continuar</p>
-
       <form @submit.prevent="login" class="mt-6 space-y-4">
         <div class="relative">
           <input
@@ -20,7 +19,6 @@
           />
           <i class="fas fa-envelope absolute right-5 top-4 text-gray-400 dark:text-gray-500"></i>
         </div>
-
         <div class="relative">
           <input
             v-model="password"
@@ -35,7 +33,6 @@
             @click="togglePassword"
           ></i>
         </div>
-
         <button
           type="submit"
           class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-full shadow-md transition-all duration-300 transform hover:scale-105"
@@ -45,31 +42,26 @@
           <span v-else>Iniciar Sesión</span>
         </button>
       </form>
-
       <p v-if="errorMessage" class="text-red-500 text-center mt-2">{{ errorMessage }}</p>
-
       <div class="flex justify-between items-center mt-4">
         <a href="#" class="text-sm text-blue-500 hover:underline">¿Olvidaste tu contraseña?</a>
         <router-link to="/register" class="text-sm text-gray-600 dark:text-gray-300 hover:underline"
           >Crear una cuenta</router-link
         >
       </div>
-
       <div class="mt-6 flex items-center justify-center space-x-3">
         <span class="h-px w-16 bg-gray-400"></span>
         <span class="text-gray-500 dark:text-gray-400 text-sm">O continúa con</span>
         <span class="h-px w-16 bg-gray-400"></span>
       </div>
-
       <div class="flex justify-center mt-4">
         <button
           class="p-3 bg-white dark:bg-gray-700 shadow-md rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300"
+          @click="googleLogin"
         >
           <i class="fab fa-google text-red-500 text-lg"></i>
         </button>
       </div>
-
-      <!-- Botón para Volver -->
       <button
         @click="goToHome"
         class="mt-6 w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
@@ -84,14 +76,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { signInWithGoogle } from '@/firebaseConfig'
 
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
-const authStore = useAuthStore()
-const router = useRouter()
 const showPassword = ref(false)
+const router = useRouter()
+const authStore = useAuthStore()
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -100,12 +93,9 @@ const togglePassword = () => {
 const login = async () => {
   errorMessage.value = ''
   loading.value = true
-
   try {
     await authStore.login(email.value, password.value)
     const role = authStore.role
-
-    // Redirigir según el rol
     if (role === 'Admin') {
       router.push('/dashboard-admin')
     } else if (role === 'Usuario') {
@@ -119,6 +109,21 @@ const login = async () => {
     errorMessage.value = error.message || 'Error al iniciar sesión'
   } finally {
     loading.value = false
+  }
+}
+
+const googleLogin = async () => {
+  try {
+    const user = await signInWithGoogle()
+    console.log('Usuario autenticado:', user)
+    if (user?.email) {
+      router.push('/dashboard-usuario')
+    } else {
+      errorMessage.value = 'Error: No se pudo obtener la cuenta de Google'
+    }
+  } catch (error) {
+    errorMessage.value = 'Error al iniciar sesión con Google'
+    console.error('Google Login Error:', error)
   }
 }
 

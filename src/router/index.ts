@@ -15,32 +15,16 @@ import RestaurantDetail from '@/views/Admin/RestaurantDetail.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: Home,
-    },
+    { path: '/', name: 'home', component: Home },
     {
       path: '/restaurant/:id',
       name: 'restaurantDetails',
       component: RestaurantDetails,
       props: true,
     },
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'notFound',
-      component: NotFound,
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: Login,
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: Register,
-    },
+    { path: '/:pathMatch(.*)*', name: 'notFound', component: NotFound },
+    { path: '/login', name: 'login', component: Login },
+    { path: '/register', name: 'register', component: Register },
 
     //Rutas para el administrador
     {
@@ -79,7 +63,7 @@ const router = createRouter({
       path: '/dashboard-usuario',
       name: 'dashboardUsuario',
       component: DashboardUsuario,
-      meta: { requiresAuth: true, role: 'Usuario' },
+      meta: { requiresAuth: true },
     },
 
     // Rutas para la hostess
@@ -87,24 +71,18 @@ const router = createRouter({
       path: '/dashboard-hostess',
       name: 'dashboardHostess',
       component: DashboardHostess,
-      meta: { requiresAuth: true, role: 'Hostess' },
+      meta: { requiresAuth: true },
     },
   ],
 })
 
-// Middleware de autenticación y autorización
+// 🔹 Middleware de autenticación
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  const role = localStorage.getItem('role')
 
   // Si la ruta requiere autenticación y no hay token, redirige al login
   if (to.meta.requiresAuth && !token) {
     return next('/login')
-  }
-
-  // Si la ruta tiene un rol específico y el usuario no tiene el rol correcto, redirige a Home
-  if (to.meta.role && to.meta.role !== role) {
-    return next('/')
   }
 
   next()

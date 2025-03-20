@@ -44,10 +44,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import { showLogoutConfirm } from '@/utils/swalUtils' // Asegúrate de tener esta función en tus utilidades
+import { showLogoutConfirm } from '@/utils/swalUtils'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -92,6 +92,13 @@ const logout = () => {
     router.push('/login')
   })
 }
+
+// Actualizar automáticamente la Sidebar cuando el usuario cambia
+watchEffect(() => {
+  if (authStore.token) {
+    isExpanded.value = true // Asegurar que la Sidebar aparece tras login
+  }
+})
 </script>
 
 <style scoped>

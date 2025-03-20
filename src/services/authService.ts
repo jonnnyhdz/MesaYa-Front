@@ -20,12 +20,12 @@ export const authService = {
       // Decodificamos el token
       const decoded: DecodedToken = jwtDecode(token)
       const userRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
-      const userName = decoded.email // Aquí estás guardando el nombre
+      const userName = decoded.email
 
       // Guardamos en LocalStorage
       localStorage.setItem('token', token)
       localStorage.setItem('role', userRole)
-      localStorage.setItem('nombre', userName) // Guardamos el nombre del usuario
+      localStorage.setItem('nombre', userName)
 
       return { token, role: userRole, nombre: userName }
     } catch (error) {

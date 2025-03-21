@@ -51,10 +51,30 @@ export const authService = {
     }
   },
 
-  logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('role')
-    localStorage.removeItem('nombre')
+  logout: async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      await axios.post(
+        `${API_URL}/Auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      // Limpia localStorage después de cerrar sesión exitosamente
+      localStorage.removeItem('token')
+      localStorage.removeItem('role')
+      localStorage.removeItem('nombre')
+      localStorage.removeItem('usuarioId')
+    } catch (error) {
+      console.error('Error en logout:', error)
+      throw new Error('No se pudo cerrar sesión correctamente')
+    }
   },
 
   getToken() {

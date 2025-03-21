@@ -9,20 +9,24 @@ export const useAuthStore = defineStore('auth', {
     token: authService.getToken(),
     role: authService.getRole(),
     nombre: authService.getNombre(),
+    usuarioId: localStorage.getItem('usuarioId') ? Number(localStorage.getItem('usuarioId')) : null, // Inicializar usuarioId desde localStorage
     user: null,
   }),
 
   actions: {
     async login(email: string, password: string) {
       try {
-        const { token, role, nombre } = await authService.login(email, password)
+        const { token, role, nombre, usuarioId } = await authService.login(email, password)
         this.token = token
         this.role = role
         this.nombre = nombre
+        this.usuarioId = usuarioId
 
+        // Guardar en localStorage
         localStorage.setItem('token', token)
         localStorage.setItem('role', role)
         localStorage.setItem('nombre', nombre)
+        if (usuarioId) localStorage.setItem('usuarioId', usuarioId.toString())
       } catch (error) {
         console.error('Error en el login:', error)
         throw error
@@ -37,6 +41,7 @@ export const useAuthStore = defineStore('auth', {
         this.nombre = user.displayName || user.email
         this.user = user
 
+        // Guardar en localStorage
         localStorage.setItem('token', token)
         localStorage.setItem('role', this.role)
         localStorage.setItem('nombre', this.nombre)
@@ -51,14 +56,18 @@ export const useAuthStore = defineStore('auth', {
         await signOut(auth) // Cierra sesión en Firebase
         authService.logout() // Limpia datos de la API externa
 
+        // Limpiar el estado
         this.token = null
         this.role = null
         this.nombre = null
+        this.usuarioId = null
         this.user = null
 
+        // Limpiar localStorage
         localStorage.removeItem('token')
         localStorage.removeItem('role')
         localStorage.removeItem('nombre')
+        localStorage.removeItem('usuarioId')
       } catch (error) {
         console.error('Error al cerrar sesión:', error)
         throw error
@@ -107,6 +116,9 @@ export const initializeAuthListener = () => {
         authStore.token = token
         authStore.role = localStorage.getItem('role')
         authStore.nombre = localStorage.getItem('nombre')
+        authStore.usuarioId = localStorage.getItem('usuarioId')
+          ? Number(localStorage.getItem('usuarioId'))
+          : null
       } else {
         // Si no hay token, limpiamos el store
         authStore.setUser(null)

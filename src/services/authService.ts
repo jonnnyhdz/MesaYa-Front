@@ -9,6 +9,7 @@ interface DecodedToken {
   jti: string
   'http://schemas.microsoft.com/ws/2008/06/identity/claims/role': string
   exp: number
+  usuarioId?: number
 }
 
 export const authService = {
@@ -21,13 +22,15 @@ export const authService = {
       const decoded: DecodedToken = jwtDecode(token)
       const userRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
       const userName = decoded.email
+      const usuarioId = decoded.usuarioId || null
 
       // Guardamos en LocalStorage
       localStorage.setItem('token', token)
       localStorage.setItem('role', userRole)
       localStorage.setItem('nombre', userName)
+      if (usuarioId) localStorage.setItem('usuarioId', usuarioId.toString())
 
-      return { token, role: userRole, nombre: userName }
+      return { token, role: userRole, nombre: userName, usuarioId }
     } catch (error) {
       console.error('Error en login:', error)
       throw new Error('Credenciales incorrectas o error en el servidor')

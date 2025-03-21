@@ -12,6 +12,7 @@ import GestionUsuarios from '@/views/Admin/GestionUsuarios.vue'
 import CreateRestaurant from '@/views/Admin/CreateRestaurant.vue'
 import RestaurantDetail from '@/views/Admin/RestaurantDetail.vue'
 import CreateUser from '@/views/Admin/CreateUser.vue'
+import DetallesRestaurante from '@/views/Hostess/DetallesRestaurante.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,12 @@ const router = createRouter({
       path: '/dashboard-hostess',
       name: 'dashboardHostess',
       component: DashboardHostess,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/detalles-restaurante/:id',
+      name: 'detailsRestaurante', // Nombre de la ruta (en minúsculas)
+      component: DetallesRestaurante,
       meta: { requiresAuth: true },
     },
   ],

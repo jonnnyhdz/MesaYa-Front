@@ -65,6 +65,16 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async register(name: string, email: string, password: string) {
+      try {
+        const response = await authService.register(name, email, password)
+        return response
+      } catch (error) {
+        console.error('Error en el registro:', error)
+        throw error
+      }
+    },
+
     setUser(user: any) {
       if (user) {
         this.token = user.accessToken || authService.getToken()

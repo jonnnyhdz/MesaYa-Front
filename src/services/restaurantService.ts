@@ -54,10 +54,22 @@ export const restaurantService = {
       throw new Error('No se pudo eliminar el restaurante')
     }
   },
-
   async updateRestaurant(id: number, data: any) {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, data)
+      // Verificamos que los valores de la imagen y el encargado se manejen correctamente
+      const updatedData = {
+        restauranteNombre: data.restauranteNombre, // Se asegura de que el nombre sea 'restauranteNombre' como espera el backend
+        direccion: data.direccion || '',
+        telefono: data.telefono || '',
+        horario: data.horario || '',
+        imagenUrl: data.imagenUrl || '', // Si no hay imagen, mandamos una cadena vacía
+        descripcion: data.descripcion || '',
+        userId: data.userId || null, // Si no se selecciona un encargado, enviamos null
+      }
+
+      console.log('📤 Enviando datos actualizados:', JSON.stringify(updatedData, null, 2))
+
+      const response = await axios.put(`${API_URL}/${id}`, updatedData)
       return response.data
     } catch (error) {
       console.error('Error actualizando restaurante:', error.response?.data || error)

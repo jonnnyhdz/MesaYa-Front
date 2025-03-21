@@ -17,6 +17,16 @@
             class="restaurant-image"
           />
         </div>
+        <div>
+          <input
+            v-model="restaurant.imagen"
+            type="text"
+            placeholder="URL de la imagen"
+            class="input"
+            :disabled="!isEditing"
+          />
+          <label class="label">Imagen (URL)</label>
+        </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
@@ -57,7 +67,12 @@
         </div>
 
         <div>
-          <input v-model="restaurant.encargado" type="text" class="input disabled" disabled />
+          <select v-model="restaurant.userId" class="input" :disabled="!isEditing" required>
+            <option v-if="!restaurant.userId" disabled value="">Selecciona un encargado</option>
+            <option v-for="user in users" :key="user.usuarioId" :value="user.usuarioId">
+              {{ user.username }}
+            </option>
+          </select>
           <label class="label">Encargado</label>
         </div>
 
@@ -81,11 +96,13 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { restaurantService } from '@/services/restaurantService'
+import { userService } from '@/services/userService' // Importa el servicio de usuarios
 import { showSuccessAlert, showErrorAlert, showEditModeAlert } from '@/utils/swalUtils'
 
 const route = useRoute()
 const router = useRouter()
 const isEditing = ref(false)
+const restaurantId = route.params.id // Aquí se obtiene el id de la URL
 
 const restaurant = ref({
   nombre: '',
@@ -94,12 +111,13 @@ const restaurant = ref({
   horario: '',
   imagen: '',
   descripcion: '',
-  encargado: '',
+  userId: null,
 })
+
+const users = ref([]) // Aquí se mantendrán los usuarios disponibles para el encargado
 
 onMounted(async () => {
   try {
-    const restaurantId = route.params.id
     const data = await restaurantService.getRestaurantById(restaurantId)
 
     restaurant.value = {
@@ -109,10 +127,13 @@ onMounted(async () => {
       horario: data.horario,
       imagen: data.imagenUrl,
       descripcion: data.descripcion,
-      encargado: data.usuario?.username || 'No asignado',
+      userId: data.userId || null, // Aquí se obtiene el ID del encargado
     }
-  } catch {
+
+    users.value = await userService.getHostessUsers()
+  } catch (error) {
     showErrorAlert('No se pudieron cargar los detalles del restaurante.')
+    console.error(error)
   }
 })
 
@@ -122,12 +143,32 @@ const enableEditing = () => {
 }
 
 const saveChanges = async () => {
+  console.log('Restaurant Data: ', restaurant.value)
+
+  if (!restaurant.value.nombre || !restaurant.value.userId) {
+    showErrorAlert('El nombre del restaurante y el encargado son obligatorios.')
+    return
+  }
+
   try {
-    await restaurantService.updateRestaurant(route.params.id, restaurant.value)
+    const updatedRestaurant = {
+      restauranteNombre: restaurant.value.nombre,
+      direccion: restaurant.value.direccion,
+      telefono: restaurant.value.telefono,
+      horario: restaurant.value.horario,
+      imagenUrl: restaurant.value.imagen || '',
+      descripcion: restaurant.value.descripcion,
+      userId: restaurant.value.userId || null,
+    }
+
+    await restaurantService.updateRestaurant(restaurantId, updatedRestaurant)
     isEditing.value = false
     showSuccessAlert('Los cambios han sido guardados exitosamente.')
-  } catch {
+
+    router.push('/restaurantes-admin')
+  } catch (error) {
     showErrorAlert('Error al guardar los cambios.')
+    console.error(error)
   }
 }
 

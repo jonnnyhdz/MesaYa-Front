@@ -55,6 +55,7 @@ const router = createRouter({
       path: '/restaurante/:id',
       name: 'restautanDetails',
       component: RestaurantDetail,
+      props: true,
       meta: { requiresAuth: true, role: 'Admin' },
     },
 

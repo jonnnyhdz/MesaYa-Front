@@ -32,34 +32,16 @@ export const useRestaurantStore = defineStore('restaurant', {
         const response = await restaurantService.getAllRestaurants()
 
         if (response.$values) {
-          const userMap = new Map()
-
-          response.$values.forEach((r: any) => {
-            if (r.usuario && r.usuario.$id) {
-              userMap.set(r.usuario.$id, r.usuario)
-            }
-          })
-
           this.restaurants = response.$values.map((r: any) => {
-            let encargadoNombre = 'No asignado'
-
-            if (r.usuario) {
-              if (r.usuario.$id) {
-                encargadoNombre = userMap.get(r.usuario.$id)?.username || 'No asignado'
-              } else if (r.usuario.$ref) {
-                encargadoNombre = userMap.get(r.usuario.$ref)?.username || 'No asignado'
-              }
-            }
-
             return {
-              id: r.restauranteId,
-              nombre: r.restauranteNombre,
+              id: r.id, // Usa directamente el ID
+              nombre: r.restauranteNombre, // Usa el nombre directamente
               direccion: r.direccion,
               telefono: r.telefono,
               horario: r.horario,
               imagen: r.imagenUrl,
               descripcion: r.descripcion,
-              encargado: encargadoNombre,
+              encargado: r.userName || 'No asignado', // Usa directamente el campo userName
               estado: r.isDeleted ? 'Cerrado' : 'Abierto',
               reservas: 0,
               calificacion: 0,

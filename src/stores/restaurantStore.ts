@@ -65,6 +65,20 @@ export const useRestaurantStore = defineStore('restaurant', {
       this.restaurants = this.restaurants.filter((r) => r.id !== id)
     },
 
+    async updateRestaurantState(id: number, newState: string) {
+      try {
+        const response = await restaurantService.updateRestaurantState(id, newState)
+        // Actualiza el estado del restaurante localmente en el store
+        const restaurant = this.restaurants.find((r) => r.id === id)
+        if (restaurant) {
+          restaurant.estado = newState
+        }
+      } catch (error) {
+        console.error('Error al actualizar el estado del restaurante:', error)
+        throw new Error('No se pudo actualizar el estado del restaurante')
+      }
+    },
+
     // 📌 Funciones para cambiar página
     nextPage() {
       if (this.currentPage < this.totalPages) {

@@ -76,4 +76,14 @@ export const restaurantService = {
       throw new Error('No se pudo actualizar el restaurante')
     }
   },
+
+  async updateRestaurantState(id: number) {
+    try {
+      const response = await axios.patch(`${API_URL}/restore/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('Error al actualizar el estado del restaurante:', error)
+      throw new Error('No se pudo actualizar el estado del restaurante')
+    }
+  },
 }

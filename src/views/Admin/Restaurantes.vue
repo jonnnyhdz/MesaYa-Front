@@ -57,6 +57,15 @@
               >
                 {{ restaurant.estado }}
               </span>
+
+              <button
+                v-if="restaurant.estado === 'Cerrado'"
+                @click="toggleState(restaurant.id)"
+                class="ml-2 text-yellow-500 hover:text-yellow-700"
+                title="Activar Restaurante"
+              >
+                <i class="fas fa-lock-open"></i>
+              </button>
             </td>
             <td class="py-4 px-4 text-center">
               <div class="flex items-center justify-center space-x-3">
@@ -108,7 +117,7 @@
 import { onMounted } from 'vue'
 import { useRestaurantStore } from '@/stores/restaurantStore'
 import { useRouter } from 'vue-router'
-import { showDeleteConfirm } from '@/utils/swalUtils'
+import { showDeleteConfirm, showSuccessAlert, showErrorAlert } from '@/utils/swalUtils'
 
 const restaurantStore = useRestaurantStore()
 const router = useRouter()
@@ -130,6 +139,22 @@ const deleteRestaurant = async (id) => {
       restaurantStore.currentPage = restaurantStore.totalPages
     }
   })
+}
+
+const toggleState = async (restaurantId) => {
+  try {
+    const restaurant = restaurantStore.paginatedRestaurants.find((r) => r.id === restaurantId)
+
+    const newState = restaurant.estado === 'Cerrado' ? 'Abierto' : 'Cerrado'
+
+    await restaurantStore.updateRestaurantState(restaurantId, newState)
+
+    restaurantStore.fetchRestaurants()
+    showSuccessAlert(`El restaurante ha sido ${newState.toLowerCase()} exitosamente.`)
+  } catch (error) {
+    showErrorAlert('Error al cambiar el estado del restaurante.')
+    console.error(error)
+  }
 }
 </script>
 

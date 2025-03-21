@@ -11,7 +11,7 @@ export const showSuccessAlert = (message: string) => {
     icon: 'success',
     confirmButtonText: 'OK',
     confirmButtonColor: '#10b981',
-    timer: 2500,
+    timer: 1500,
     timerProgressBar: true,
   })
 }
@@ -24,7 +24,7 @@ export const showEditModeAlert = () => {
     icon: 'info',
     title: 'Modo Edición Activado',
     text: 'Ahora puedes modificar la información del restaurante.',
-    timer: 2000,
+    timer: 1500,
     timerProgressBar: true,
     showConfirmButton: false,
   })
@@ -51,8 +51,9 @@ export const showDeleteConfirm = (onConfirm: () => void) => {
         title: '¡Eliminado!',
         text: 'El restaurante ha sido eliminado correctamente.',
         icon: 'success',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#10b981',
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
       })
     }
   })

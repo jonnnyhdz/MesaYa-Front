@@ -49,7 +49,7 @@ export const hostessService = {
 
   async crearMesa(mesa: IMesa): Promise<void> {
     try {
-      const response = await axios.post(`${API_URL}/Mesa`, mesa)
+      const response = await axios.post(`${API_URL}/Mesa/crear`, mesa)
       console.log('Respuesta del backend:', response.data) // Verifica la respuesta del backend
       return response.data
     } catch (error) {

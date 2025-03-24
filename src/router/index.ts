@@ -13,6 +13,7 @@ import CreateRestaurant from '@/views/Admin/CreateRestaurant.vue'
 import RestaurantDetail from '@/views/Admin/RestaurantDetail.vue'
 import CreateUser from '@/views/Admin/CreateUser.vue'
 import DetallesRestaurante from '@/views/Hostess/DetallesRestaurante.vue'
+import EditUser from '@/views/Admin/EditUser.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,6 +61,13 @@ const router = createRouter({
       meta: { requiresAuth: true, role: 'Admin' },
     },
     {
+      path: '/admin/usuario/:userId',
+      name: 'editUser',
+      component: EditUser,
+      meta: { requiresAuth: true, role: 'Admin' },
+    },
+
+    {
       path: '/restaurante/:id',
       name: 'restautanDetails',
       component: RestaurantDetail,
@@ -72,7 +80,7 @@ const router = createRouter({
       path: '/dashboard-usuario',
       name: 'dashboardUsuario',
       component: DashboardUsuario,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role: 'Usuario' },
     },
 
     // Rutas para la hostess
@@ -80,26 +88,48 @@ const router = createRouter({
       path: '/dashboard-hostess',
       name: 'dashboardHostess',
       component: DashboardHostess,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role: 'Hostess' },
     },
     {
       path: '/detalles-restaurante/:id',
-      name: 'detailsRestaurante', // Nombre de la ruta (en minúsculas)
+      name: 'detailsRestaurante',
       component: DetallesRestaurante,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role: 'Hostess' },
     },
   ],
 })
 
-// 🔹 Middleware de autenticación
+// 🔹 Middleware de autenticación + autorización
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const userRole = localStorage.getItem('role')
 
-  // Si la ruta requiere autenticación y no hay token, redirige al login
+  // 1. Si la ruta no requiere autenticación, continuar
+  if (!to.meta.requiresAuth) return next()
+
+  // 2. Si requiere auth y no hay token, redirige a login
   if (to.meta.requiresAuth && !token) {
     return next('/login')
   }
 
+  // 3. Si la ruta tiene un rol específico requerido
+  if (to.meta.role) {
+    // Si el rol del usuario no coincide, redirigir al dashboard correspondiente
+    if (to.meta.role !== userRole) {
+      switch (userRole) {
+        case 'Admin':
+          return next('/dashboard-admin')
+        case 'Usuario':
+          return next('/dashboard-usuario')
+        case 'Hostess':
+          return next('/dashboard-hostess')
+        default:
+          return next('/login') // Si no hay rol válido
+      }
+    }
+  }
+
+  // 4. Si todo está correcto, continuar
   next()
 })
 

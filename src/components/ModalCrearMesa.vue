@@ -5,25 +5,25 @@
       <form @submit.prevent="crearMesa">
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Número de Mesa</label>
+            <label class="block text-sm font-medium text-gray-700"> Número de Mesa </label>
             <input
-              v-model="mesa.mesaNumero"
+              v-model.number="mesa.mesaNumero"
               type="number"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               required
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Capacidad</label>
+            <label class="block text-sm font-medium text-gray-700"> Capacidad </label>
             <input
-              v-model="mesa.capacidad"
+              v-model.number="mesa.capacidad"
               type="number"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               required
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Disponible</label>
+            <label class="block text-sm font-medium text-gray-700"> Disponible </label>
             <select
               v-model="mesa.disponible"
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -61,32 +61,30 @@ import { hostessService } from '@/services/hostessService'
 import Swal from 'sweetalert2'
 
 const route = useRoute()
-const emit = defineEmits(['cerrar', 'mesa-creada']) // Emitir evento para actualizar la lista de mesas
+const emit = defineEmits(['cerrar', 'mesa-creada'])
 
 const mesa = ref({
   mesaNumero: 0,
   capacidad: 0,
   disponible: true,
-  restauranteId: Number(route.params.id), // Asegúrate de que el ID del restaurante sea correcto
+  restauranteId: Number(route.params.id),
 })
 
 const crearMesa = async () => {
   try {
     const mesaCreada = await hostessService.crearMesa(mesa.value)
-    console.log('Mesa creada:', mesaCreada) // Verifica la respuesta del backend
-
-    // Muestra una alerta de éxito
+    console.log('Mesa creada:', mesaCreada)
     Swal.fire({
       icon: 'success',
       title: 'Mesa creada',
       text: 'La mesa se ha creado correctamente.',
       confirmButtonText: 'Aceptar',
     })
-
-    emit('mesa-creada', mesaCreada) // Emite el evento para actualizar la lista de mesas
-    emit('cerrar') // Cierra el modal
+    // Emitir el evento para actualizar la lista en el padre
+    emit('mesa-creada', mesaCreada)
+    // Cerrar el modal
+    emit('cerrar')
   } catch (error) {
-    // Muestra una alerta de error
     Swal.fire({
       icon: 'error',
       title: 'Error',

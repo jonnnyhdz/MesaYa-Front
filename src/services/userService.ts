@@ -6,25 +6,10 @@ export const userService = {
   async getAllUsers() {
     try {
       const response = await axios.get(`${API_URL}/Usuario/all`)
-      return response.data?.$values || [] // Asegúrate de extraer los usuarios de $values
+      return response.data?.$values || []
     } catch (error) {
       console.error('Error al obtener todos los usuarios:', error)
       return []
-    }
-  },
-
-  async registerUser(userData) {
-    try {
-      const payload = {
-        username: userData.username, // Nombre de usuario
-        email: userData.email, // Correo electrónico
-        password: userData.password, // Contraseña
-      }
-      const response = await axios.post(`${API_URL}/Usuario/register`, payload)
-      return response.data
-    } catch (error) {
-      console.error('Error al registrar el usuario:', error)
-      throw error
     }
   },
 
@@ -35,6 +20,41 @@ export const userService = {
     } catch (error) {
       console.error('Error al obtener los usuarios Hostess:', error)
       return []
+    }
+  },
+
+  async getUserById(id) {
+    try {
+      const response = await axios.get(`${API_URL}/Usuario/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('Error al obtener el usuario:', error)
+      throw new Error('No se pudo cargar el usuario')
+    }
+  },
+
+  async registerUser(userData) {
+    try {
+      const payload = {
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+      }
+      const response = await axios.post(`${API_URL}/Usuario/register`, payload)
+      return response.data
+    } catch (error) {
+      console.error('Error al registrar el usuario:', error)
+      throw error
+    }
+  },
+
+  async editUser(userData) {
+    try {
+      const response = await axios.post(`${API_URL}/Usuario/edit-user`, userData)
+      return response.data
+    } catch (error) {
+      console.error('Error editando el usuario:', error.response?.data || error)
+      throw new Error('No se pudo editar el usuario')
     }
   },
 }

@@ -1,175 +1,208 @@
 <template>
-  <div class="min-h-screen dark:bg-gray-900 p-6">
-    <!-- Bienvenida -->
-    <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">
-      Bienvenido, <span class="text-black dark:text-white font-extrabold">{{ nombre }}</span> 👋
+  <div class="p-8 animate-fadeIn">
+    <!-- Encabezado -->
+    <h1 class="text-xl italic font-semibold text-gray-900 dark:text-white mb-6">
+      Bienvenido, <span class="italic font-light">{{ nombre }}</span> 👋
     </h1>
 
     <!-- Tarjetas de Resumen -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-      <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex flex-col justify-between">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">Restaurantes</h2>
-          <i class="fas fa-utensils text-2xl"></i>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Restaurantes -->
+      <div
+        class="bg-white border border-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-6 transition-transform duration-300 hover:scale-105"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Restaurantes</h2>
+          <i class="fas fa-utensils text-2xl text-green-600"></i>
         </div>
-        <p class="text-4xl font-bold mt-2">{{ restaurantes.length }}</p>
+        <p class="text-4xl font-bold text-gray-800 dark:text-white">
+          {{ restaurantes.length }}
+        </p>
       </div>
 
-      <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex flex-col justify-between">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">Colaboradores</h2>
-          <i class="fas fa-users text-2xl"></i>
+      <!-- Colaboradores (Hostess) -->
+      <div
+        class="bg-white border border-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-6 transition-transform duration-300 hover:scale-105"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Colaboradores</h2>
+          <i class="fas fa-users text-2xl text-blue-600"></i>
         </div>
-        <p class="text-4xl font-bold mt-2">15</p>
+        <p class="text-4xl font-bold text-gray-800 dark:text-white">
+          {{ colaboradoresCount }}
+        </p>
       </div>
 
-      <div class="bg-gray-800 text-white p-6 rounded-lg shadow-md flex flex-col justify-between">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">Mensajes</h2>
-          <i class="fas fa-envelope text-2xl"></i>
+      <!-- Mensajes -->
+      <div
+        class="bg-white border border-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-6 transition-transform duration-300 hover:scale-105"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Mensajes</h2>
+          <i class="fas fa-envelope text-2xl text-purple-600"></i>
         </div>
-        <p class="text-sm mt-2">Enviados: 15 | Recibidos: 15</p>
+        <p class="text-sm text-gray-800 dark:text-white">Enviados: 15 | Recibidos: 15</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <!-- Restaurantes Destacados -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
       <!-- Restaurante con más Reservas -->
       <div
-        class="bg-blue-600 text-white p-6 rounded-lg shadow-md flex justify-between items-center"
+        class="bg-blue-500 text-white shadow-lg rounded-lg p-6 flex justify-between items-center transition-transform duration-300 hover:scale-105"
       >
         <div>
-          <h3 class="text-md">Restaurante con más Reservas:</h3>
+          <h3 class="text-md font-medium">Restaurante con más Reservas:</h3>
           <h2 class="text-xl font-semibold">{{ topRestaurante.nombre }}</h2>
-          <p>{{ topRestaurante.reservas }} Reservas</p>
+          <p class="mt-1">{{ topRestaurante.reservas }} Reservas</p>
         </div>
-        <img :src="topRestaurante.imagen" alt="Restaurante" class="w-24 h-24 rounded-lg" />
+        <img
+          :src="topRestaurante.imagen"
+          alt="Restaurante"
+          class="w-24 h-24 rounded-lg object-cover"
+        />
       </div>
 
       <!-- Restaurante con menos Reservas -->
       <div
-        class="bg-gray-700 text-white p-6 rounded-lg shadow-md flex justify-between items-center"
+        class="bg-gray-700 text-white shadow-lg rounded-lg p-6 flex justify-between items-center transition-transform duration-300 hover:scale-105"
       >
         <div>
-          <h3 class="text-md">Restaurante con menos Reservas:</h3>
+          <h3 class="text-md font-medium">Restaurante con menos Reservas:</h3>
           <h2 class="text-xl font-semibold">{{ lowRestaurante.nombre }}</h2>
-          <p>{{ lowRestaurante.reservas }} Reservas</p>
+          <p class="mt-1">{{ lowRestaurante.reservas }} Reservas</p>
         </div>
-        <img :src="lowRestaurante.imagen" alt="Restaurante" class="w-24 h-24 rounded-lg" />
+        <img
+          :src="lowRestaurante.imagen"
+          alt="Restaurante"
+          class="w-24 h-24 rounded-lg object-cover"
+        />
       </div>
     </div>
 
-    <!-- Tabla de Restaurantes -->
-    <div class="mt-6 bg-gray-800 text-white p-6 rounded-lg shadow-md">
-      <h2 class="text-xl font-bold mb-4">Restaurantes en Gestión</h2>
-      <table class="w-full text-left border-collapse">
+    <!-- Tabla de Restaurantes en Gestión -->
+    <div
+      class="mt-4 bg-white border border-gray-100 dark:bg-gray-900 shadow-lg rounded-lg p-6 overflow-x-auto"
+    >
+      <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Restaurantes en Gestión</h2>
+      <table class="w-full border-collapse">
         <thead>
-          <tr class="border-b border-gray-700">
-            <th class="py-2 px-4">#</th>
-            <th class="py-2 px-4">Nombre</th>
-            <th class="py-2 px-4">Giro</th>
-            <th class="py-2 px-4">Reservas</th>
-            <th class="py-2 px-4">Calificación</th>
-            <th class="py-2 px-4">Encargado</th>
-            <th class="py-2 px-4">Estado</th>
-            <th class="py-2 px-4">Acciones</th>
+          <tr
+            class="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-300 uppercase text-sm font-semibold"
+          >
+            <th class="py-3 px-4 text-left">#</th>
+            <th class="py-3 px-4 text-left">Nombre</th>
+            <th class="py-3 px-4 text-left">Reservas</th>
+            <th class="py-3 px-4 text-left">Encargado</th>
+            <th class="py-3 px-4 text-center">Estado</th>
           </tr>
         </thead>
         <tbody>
           <tr
             v-for="(restaurante, index) in restaurantes"
-            :key="index"
-            class="border-b border-gray-700"
+            :key="restaurante.id"
+            class="border-t border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
           >
-            <td class="py-2 px-4">{{ index + 1 }}</td>
-            <td class="py-2 px-4">{{ restaurante.nombre }}</td>
-            <td class="py-2 px-4">{{ restaurante.giro }}</td>
-            <td class="py-2 px-4">{{ restaurante.reservas }}</td>
-            <td class="py-2 px-4 text-yellow-400">{{ restaurante.calificacion }} ⭐</td>
-            <td class="py-2 px-4">{{ restaurante.encargado }}</td>
-            <td class="py-2 px-4">
+            <td class="py-4 px-4">
+              {{ index + 1 }}
+            </td>
+            <td class="py-4 px-4 font-semibold text-gray-900 dark:text-white">
+              {{ restaurante.nombre }}
+            </td>
+            <td class="py-4 px-4 text-gray-800 dark:text-white">
+              {{ restaurante.reservas }}
+            </td>
+            <td class="py-4 px-4 text-gray-700 dark:text-gray-300">
+              {{ restaurante.encargado }}
+            </td>
+            <td class="py-4 px-4 text-center">
               <span
-                class="px-3 py-1 rounded-lg"
-                :class="{
-                  'bg-green-500': restaurante.estado === 'Abierto',
-                  'bg-red-500': restaurante.estado === 'Cerrado',
-                }"
+                :class="restaurantEstadoClass(restaurante.estado)"
+                class="px-3 py-1 rounded-full text-sm font-semibold"
               >
                 {{ restaurante.estado }}
               </span>
             </td>
-            <td class="py-2 px-4">
-              <button class="text-blue-400 hover:text-blue-300">
-                <i class="fas fa-pencil-alt"></i>
-              </button>
-            </td>
           </tr>
         </tbody>
       </table>
+      <!-- Botón "Ver más" -->
+      <div class="flex justify-end mt-4">
+        <router-link
+          to="/restaurantes-admin"
+          class="bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-green-700 transition-all"
+        >
+          Ver más
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useRestaurantStore } from '@/stores/restaurantStore'
+import { useUserStore } from '@/stores/userStore'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const restaurantStore = useRestaurantStore()
+const userStore = useUserStore()
+const router = useRouter()
+
+// Nombre del administrador
 const nombre = computed(() => authStore.nombre)
 
-// Datos de ejemplo
-const restaurantes = ref([
-  {
-    nombre: 'El Yucateco',
-    giro: 'Taquería',
-    reservas: 15,
-    calificacion: 4.9,
-    encargado: 'Jonathan Hernandez',
-    estado: 'Abierto',
-  },
-  {
-    nombre: 'Moka Cafetería',
-    giro: 'Cafetería',
-    reservas: 11,
-    calificacion: 4.2,
-    encargado: 'Daniel Tuz',
-    estado: 'Cerrado',
-  },
-  {
-    nombre: 'Gerardos',
-    giro: 'Pizzería',
-    reservas: 12,
-    calificacion: 4.0,
-    encargado: 'Guillermo Garcia',
-    estado: 'Abierto',
-  },
-  {
-    nombre: 'Chester’s',
-    giro: 'Pizza y Pasta',
-    reservas: 13,
-    calificacion: 3.6,
-    encargado: 'Cristian Lopez',
-    estado: 'Cerrado',
-  },
-  {
-    nombre: 'La Campechana',
-    giro: 'Marisquería',
-    reservas: 10,
-    calificacion: 2.0,
-    encargado: 'Geovani Guzman',
-    estado: 'Abierto',
-  },
-])
+// Restaurantes (datos reales desde la BD)
+const restaurantes = computed(() => restaurantStore.restaurants)
 
-const topRestaurante = computed(() =>
-  restaurantes.value.reduce(
+// Restaurante con más Reservas
+const topRestaurante = computed(() => {
+  if (!restaurantStore.restaurants.length) return {}
+  return restaurantStore.restaurants.reduce(
     (max, item) => (item.reservas > max.reservas ? item : max),
-    restaurantes.value[0],
-  ),
-)
-const lowRestaurante = computed(() =>
-  restaurantes.value.reduce(
+    restaurantStore.restaurants[0],
+  )
+})
+
+// Restaurante con menos Reservas
+const lowRestaurante = computed(() => {
+  if (!restaurantStore.restaurants.length) return {}
+  return restaurantStore.restaurants.reduce(
     (min, item) => (item.reservas < min.reservas ? item : min),
-    restaurantes.value[0],
-  ),
-)
+    restaurantStore.restaurants[0],
+  )
+})
+
+// Cantidad real de usuarios Hostess
+const colaboradoresCount = computed(() => userStore.hostessUsers.length)
+
+// Método para asignar clases según el estado del restaurante
+const restaurantEstadoClass = (estado) => {
+  return estado === 'Abierto' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+}
+
+// Cargar datos al montar el componente
+onMounted(() => {
+  restaurantStore.fetchRestaurants()
+  userStore.fetchHostessUsers()
+})
 </script>
+
+<style scoped>
+/* Animación de Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+</style>

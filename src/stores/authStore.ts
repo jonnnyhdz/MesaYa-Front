@@ -6,10 +6,10 @@ import type { IAuthState } from '../interfaces/AuthStateInterface'
 
 export const useAuthStore = defineStore('auth', {
   state: (): IAuthState => ({
-    token: authService.getToken(),
-    role: authService.getRole(),
-    nombre: authService.getNombre(),
-    usuarioId: localStorage.getItem('usuarioId') ? Number(localStorage.getItem('usuarioId')) : null, // Inicializar usuarioId desde localStorage
+    token: localStorage.getItem('token') || null, // Recuperar el token desde localStorage
+    role: localStorage.getItem('role') || null,
+    nombre: localStorage.getItem('nombre') || null,
+    usuarioId: localStorage.getItem('usuarioId') ? Number(localStorage.getItem('usuarioId')) : null,
     user: null,
   }),
 
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
         this.usuarioId = usuarioId
 
         // Guardar en localStorage
-        localStorage.setItem('token', token)
+        localStorage.setItem('token', token) // Guardar el token en localStorage
         localStorage.setItem('role', role)
         localStorage.setItem('nombre', nombre)
         if (usuarioId) localStorage.setItem('usuarioId', usuarioId.toString())

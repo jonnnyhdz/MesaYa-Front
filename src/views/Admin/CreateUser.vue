@@ -57,11 +57,11 @@
 
         <!-- Botones de acción -->
         <div class="flex justify-end space-x-3">
-          <button type="submit" class="btn-primary">
-            <i class="fas fa-save mr-2"></i> Guardar
-          </button>
           <button @click="goBack" type="button" class="btn-secondary">
             <i class="fas fa-arrow-left mr-2"></i> Cancelar
+          </button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save mr-2"></i> Guardar
           </button>
         </div>
       </form>

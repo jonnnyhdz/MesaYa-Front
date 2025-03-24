@@ -59,7 +59,6 @@ const menuItems = {
     { label: 'Inicio', path: '/dashboard-admin', icon: 'fas fa-home' },
     { label: 'Restaurantes', path: '/restaurantes-admin', icon: 'fas fa-utensils' },
     { label: 'Usuarios', path: '/gestionUsers', icon: 'fas fa-users' },
-    { label: 'Reservas', path: '/reservas', icon: 'fas fa-calendar-check' },
   ],
   Usuario: [
     { label: 'Inicio', path: '/dashboard-usuario', icon: 'fas fa-home' },

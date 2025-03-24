@@ -6,78 +6,119 @@
     ]"
     class="flex items-center justify-between w-[80%] max-w-4xl"
   >
+    <!-- Logo -->
     <h1
-      class="text-2xl font-bold text-blue-600 tracking-wide transition-all duration-300 cursor-pointer"
-      @click="scrollToSection('home')"
+      class="text-2xl font-bold text-blue-600 tracking-wide cursor-pointer"
+      @click="handleHomeClick"
     >
       MesaYa
     </h1>
 
-    <!-- Menú -->
-    <ul class="flex space-x-8">
-      <li v-for="link in links" :key="link.id">
+    <!-- Navegación -->
+    <ul class="flex space-x-8 items-center">
+      <li v-for="link in computedLinks" :key="link.id">
         <a
           href="#"
-          class="relative text-gray-700 hover:text-blue-500 transition-all duration-300 text-lg cursor-pointer"
+          class="relative text-gray-700 hover:text-blue-500 transition text-lg cursor-pointer"
           :class="{ 'font-bold text-blue-600': activeSection === link.id }"
-          @click.prevent="scrollToSection(link.id)"
+          @click.prevent="handleLinkClick(link)"
         >
           {{ link.name }}
           <span
             v-if="activeSection === link.id"
-            class="absolute bottom-[-8px] left-0 w-full h-[3px] bg-blue-500 rounded-full transition-all duration-500 ease-in-out"
+            class="absolute bottom-[-8px] left-0 w-full h-[3px] bg-blue-500 rounded-full"
           ></span>
         </a>
+      </li>
+
+      <!-- Botón de sesión -->
+      <li>
+        <button
+          v-if="authStore.token"
+          @click="logout"
+          class="text-red-500 font-medium hover:text-red-600 transition text-lg flex items-center"
+        >
+          <i class="fas fa-sign-out-alt mr-1"></i>Salir
+        </button>
+        <button
+          v-else
+          @click="router.push('/login')"
+          class="text-blue-500 font-medium hover:text-blue-600 transition text-lg"
+        >
+          Iniciar Sesión
+        </button>
       </li>
     </ul>
   </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+import { showLogoutConfirm } from '@/utils/swalUtils'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
-const links = ref([
+const scrolled = ref(false)
+const activeSection = ref('home')
+
+// 🔹 Links públicos (sin login)
+const publicLinks = [
   { id: 'home', name: 'Inicio' },
   { id: 'restaurants', name: 'Restaurantes' },
   { id: 'categories', name: 'Categoría' },
   { id: 'reviews', name: 'Reseñas' },
   { id: 'discounts', name: 'Promociones' },
-  { id: 'login', name: 'Iniciar Sesión' },
-])
+]
 
-const scrolled = ref(false)
-const activeSection = ref('home')
+// 🔹 Links privados (con login de usuario)
+const privateLinks = [
+  { id: 'dashboard', name: 'Inicio', route: '/dashboard-usuario' },
+  { id: 'favoritos', name: 'Favoritos', route: '/favoritos' },
+  { id: 'reservas', name: 'Reservas', route: '/reservas' },
+  { id: 'populares', name: 'Populares', route: '/populares' },
+]
 
-// 📌 Detectar scroll para modificar la navbar
-const handleScroll = () => {
-  scrolled.value = window.scrollY > 50
-  updateActiveSection()
+const computedLinks = computed(() => {
+  return authStore.token ? privateLinks : publicLinks
+})
+
+const handleHomeClick = () => {
+  if (authStore.token) {
+    router.push('/dashboard-usuario')
+  } else {
+    scrollToSection('home')
+  }
 }
 
-// 📌 Función para hacer scroll suave o redirigir a Login
-const scrollToSection = (id) => {
-  if (id === 'login') {
-    router.push('/login') // 🔹 AHORA FUNCIONA CORRECTAMENTE
-    return
+const handleLinkClick = (link) => {
+  if (link.route) {
+    router.push(link.route)
+  } else {
+    scrollToSection(link.id)
   }
+}
 
-  // Si es otra sección, hace scroll normal
+const scrollToSection = (id) => {
   const section = document.getElementById(id)
   if (section) {
     window.scrollTo({
-      top: section.offsetTop - 80, // Ajustar margen superior
+      top: section.offsetTop - 80,
       behavior: 'smooth',
     })
   }
 }
 
-// 📌 Función para detectar la sección visible y cambiar la clase activa
+const handleScroll = () => {
+  scrolled.value = window.scrollY > 50
+  updateActiveSection()
+}
+
 const updateActiveSection = () => {
   let currentSection = 'home'
-  links.value.forEach((link) => {
+  computedLinks.value.forEach((link) => {
     const section = document.getElementById(link.id)
     if (section) {
       const rect = section.getBoundingClientRect()
@@ -89,7 +130,14 @@ const updateActiveSection = () => {
   activeSection.value = currentSection
 }
 
-// 📌 Escuchar eventos de scroll
+// 🔹 Cerrar sesión
+const logout = () => {
+  showLogoutConfirm(() => {
+    authStore.logout()
+    router.push('/login')
+  })
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   updateActiveSection()
@@ -100,7 +148,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
+<style scoped>
 a span {
   transition: width 0.4s ease-in-out;
 }

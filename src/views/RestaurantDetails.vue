@@ -1,118 +1,135 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-6">
-    <div v-if="restaurant" class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-      <div class="relative">
-        <img
-          :src="restaurant.images[currentImage]"
-          class="w-full h-96 object-cover transition-opacity duration-500"
-        />
-        <button
-          v-if="currentImage > 0"
-          @click="prevImage"
-          class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-        >
-          ◀
-        </button>
-        <button
-          v-if="currentImage < restaurant.images.length - 1"
-          @click="nextImage"
-          class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full hover:bg-gray-700"
-        >
-          ▶
-        </button>
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div v-if="restaurante" class="space-y-6">
+      <!-- Imagen principal -->
+      <img
+        :src="restaurante.imagenUrl || defaultImage"
+        alt="Restaurante"
+        class="w-full h-64 object-cover rounded-lg"
+      />
+
+      <!-- Detalles -->
+      <div>
+        <h2 class="text-3xl font-bold text-gray-800">{{ restaurante.restauranteNombre }}</h2>
+        <p class="text-gray-600 mt-2">{{ restaurante.descripcion }}</p>
+        <div class="text-sm text-gray-500 mt-3 space-y-1">
+          <p><i class="fas fa-map-marker-alt mr-1 text-red-500"></i>{{ restaurante.direccion }}</p>
+          <p><i class="fas fa-clock mr-1 text-blue-500"></i>{{ restaurante.horario }}</p>
+          <span
+            class="inline-block mt-2 px-2 py-1 text-xs rounded-full"
+            :class="
+              restaurante.estado === 'Abierto'
+                ? 'bg-green-100 text-green-600'
+                : 'bg-red-100 text-red-600'
+            "
+          >
+            {{ restaurante.estado }}
+          </span>
+        </div>
       </div>
 
-      <div class="p-6">
-        <h1 class="text-4xl font-bold">{{ restaurant.name }}</h1>
-        <p class="text-gray-700 mt-2">{{ restaurant.description }}</p>
-        <div class="mt-4 flex items-center">
-          <span class="text-yellow-500 text-lg font-bold">{{ restaurant.rating }} ★</span>
-          <span class="ml-3 text-gray-600">{{ restaurant.reviews?.length || 0 }} Reseñas</span>
-        </div>
-
-        <div v-if="restaurant.hours?.length" class="mt-6">
-          <h3 class="text-xl font-semibold">Selecciona un horario:</h3>
-          <div class="mt-3 flex flex-wrap gap-3">
-            <button
-              v-for="(hour, index) in restaurant.hours"
-              :key="index"
-              @click="selectedHour = hour"
-              class="px-4 py-2 rounded-lg transition-all duration-300"
-              :class="{
-                'bg-blue-500 text-white': selectedHour === hour,
-                'bg-gray-200 text-gray-800 hover:bg-gray-300': selectedHour !== hour,
-              }"
-            >
-              {{ hour }}
-            </button>
+      <!-- Sección de Menús -->
+      <div>
+        <h3 class="text-2xl font-bold mb-4">Menús</h3>
+        <div
+          v-if="menusFiltrados.length"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+        >
+          <div
+            v-for="menu in menusFiltrados"
+            :key="menu.id"
+            class="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
+          >
+            <h4 class="text-lg font-semibold">{{ menu.nombreItem }}</h4>
+            <p class="text-sm text-gray-600">{{ menu.descripcion }}</p>
+            <p class="text-blue-600 font-bold mt-2">💰 ${{ menu.precio }}</p>
           </div>
         </div>
+        <p v-else class="text-gray-500">No hay menús disponibles.</p>
+      </div>
 
-        <button
-          @click="reserveTable"
-          class="mt-6 w-full py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg hover:bg-blue-600 transition-all"
-        >
-          Reservar Mesa
-        </button>
-
-        <div class="mt-8">
-          <h3 class="text-xl font-semibold">Ubicación</h3>
-          <p class="text-gray-600">{{ restaurant.address }}</p>
-          <iframe
-            v-if="restaurant.map"
-            :src="restaurant.map"
-            width="100%"
-            height="300"
-            class="mt-3 rounded-lg"
-            style="border: 0"
-            allowfullscreen=""
-            loading="lazy"
-          ></iframe>
+      <!-- Sección de Mesas -->
+      <div>
+        <h3 class="text-2xl font-bold mt-10 mb-4">Mesas Disponibles</h3>
+        <div v-if="mesas.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div
+            v-for="mesa in mesas"
+            :key="mesa.mesaId"
+            class="p-4 bg-green-50 border border-green-200 rounded-lg shadow-sm"
+          >
+            <p class="font-semibold text-gray-700">Mesa #{{ mesa.numeroMesa }}</p>
+            <p class="text-sm text-gray-500">Capacidad: {{ mesa.capacidad }}</p>
+            <div class="mt-3">
+              <button
+                v-if="mesa.disponible"
+                @click="abrirModalReserva(mesa)"
+                class="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600"
+              >
+                Reservar
+              </button>
+              <span v-else class="text-sm text-red-500">No disponible</span>
+            </div>
+          </div>
         </div>
+        <p v-else class="text-gray-500">No hay mesas registradas.</p>
       </div>
     </div>
 
-    <div v-else class="text-center text-gray-700 text-xl font-bold">
-      <p>❌ Restaurante no encontrado.</p>
-      <router-link to="/" class="text-blue-500 underline">Volver a la página principal</router-link>
-    </div>
+    <p v-else class="text-center text-gray-500">Cargando detalles del restaurante...</p>
+
+    <!-- Modal externo -->
+    <ModalReserva
+      v-if="mostrarModal && mesaSeleccionada"
+      :mesa="mesaSeleccionada"
+      @cerrar="cerrarModal"
+      @reserva-exitosa="cerrarModal"
+    />
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ModalReserva from '@/components/ModalReserva.vue'
+import { hostessService } from '@/services/hostessService'
+import type { IRestaurant, IMenu, IMesa } from '@/interfaces/RestaurantInterface'
 
 const route = useRoute()
-const restaurant = ref(null)
-const currentImage = ref(0)
-const selectedHour = ref(null)
+const restauranteId = Number(route.params.id)
+const restaurante = ref<IRestaurant | null>(null)
+const menus = ref<IMenu[]>([])
+const mesas = ref<IMesa[]>([])
+const defaultImage = 'https://source.unsplash.com/800x600/?restaurant'
 
-const fetchRestaurantData = async (id) => {
-  try {
-    const response = await fetch(`https://api.example.com/restaurants/${id}`)
-    if (!response.ok) throw new Error('No se encontró el restaurante')
+const mostrarModal = ref(false)
+const mesaSeleccionada = ref<IMesa | null>(null)
 
-    restaurant.value = await response.json()
-  } catch (error) {
-    console.error('Error al obtener el restaurante:', error)
-    restaurant.value = null
-  }
+const abrirModalReserva = (mesa: IMesa) => {
+  mesaSeleccionada.value = mesa
+  mostrarModal.value = true
 }
 
-onMounted(() => {
-  fetchRestaurantData(route.params.id)
+const cerrarModal = () => {
+  mostrarModal.value = false
+  mesaSeleccionada.value = null
+}
+
+const menusFiltrados = computed(() =>
+  menus.value.filter((menu) => menu.restauranteId === restauranteId),
+)
+
+onMounted(async () => {
+  restaurante.value = await hostessService.getRestauranteById(restauranteId)
+  menus.value = await hostessService.getMenusByRestauranteId(restauranteId)
+  mesas.value = await hostessService.getMesasByRestauranteId(restauranteId)
 })
-
-const nextImage = () => {
-  if (currentImage.value < restaurant.value.images.length - 1) currentImage.value++
-}
-const prevImage = () => {
-  if (currentImage.value > 0) currentImage.value--
-}
-
-const reserveTable = () => {
-  if (!selectedHour.value) return alert('Selecciona un horario para continuar.')
-  alert(`Mesa reservada a las ${selectedHour.value}.`)
-}
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

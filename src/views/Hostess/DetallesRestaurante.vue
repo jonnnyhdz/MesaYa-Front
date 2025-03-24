@@ -1,6 +1,5 @@
 <template>
   <div class="p-8">
-    <!-- Bloque condicional: muestra datos si restaurante existe, o estado de carga -->
     <template v-if="restaurante">
       <!-- 🔹 Título -->
       <h2 class="text-xl italic font-bold mb-8 text-blue-600 animate-fade-in">
@@ -59,39 +58,51 @@
       <div
         class="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-slide-up mb-8"
       >
-        <div class="p-6 flex justify-between items-center border-b border-gray-200">
-          <h3 class="text-2xl font-bold text-gray-800">Mesas</h3>
+        <div class="p-4 flex justify-between items-center border-b border-gray-200">
+          <h3 class="text-xl font-semibold text-gray-800">Mesas</h3>
           <button
             @click="abrirModalCrearMesa"
-            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            class="bg-teal-500 text-white px-3 py-1.5 rounded-full hover:bg-teal-600 text-sm"
           >
-            Crear Mesa
+            + Nueva Mesa
           </button>
         </div>
         <div class="p-6" v-if="mesas.length > 0">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             <div
               v-for="mesa in mesas"
               :key="mesa.mesaId"
-              class="bg-gray-50 p-4 rounded-lg shadow-sm transition-transform duration-300 hover:scale-105"
+              class="relative bg-gradient-to-tr from-blue-50 to-white border border-blue-200 rounded-2xl p-4 shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <p class="text-lg font-semibold">Mesa #{{ mesa.mesaNumero }}</p>
-              <p class="text-sm text-gray-600">Capacidad: {{ mesa.capacidad }}</p>
-              <p class="text-sm text-gray-600">
-                {{ mesa.disponible ? 'Disponible' : 'No disponible' }}
-              </p>
-              <div class="flex space-x-2 mt-2">
+              <div class="absolute -top-5 -left-5">
+                <div class="bg-blue-100 border border-blue-300 rounded-full p-2 shadow-md">
+                  <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M3 6a1 1 0 011-1h12a1 1 0 011 1v2H3V6zM3 10h14v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div class="pl-2 pt-2">
+                <h4 class="text-lg font-bold text-blue-800 mb-1">Mesa #{{ mesa.mesaNumero }}</h4>
+                <p class="text-sm text-gray-700">
+                  Capacidad: <span class="font-semibold">{{ mesa.capacidad }}</span>
+                </p>
+                <p
+                  class="text-sm font-medium mt-1"
+                  :class="mesa.disponible ? 'text-green-600' : 'text-red-500'"
+                >
+                  {{ mesa.disponible ? '🟢 Disponible' : '🔴 Ocupada' }}
+                </p>
+              </div>
+
+              <div class="mt-4 flex justify-end">
                 <button
                   @click="abrirModalEditarMesa(mesa)"
-                  class="text-blue-500 hover:text-blue-700 transition-colors"
+                  class="text-blue-600 hover:text-blue-800 transition"
+                  title="Editar"
                 >
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  @click="eliminarMesa(mesa.mesaId)"
-                  class="text-red-500 hover:text-red-700 transition-colors"
-                >
-                  <i class="fas fa-trash"></i>
+                  <i class="fas fa-pen"></i>
                 </button>
               </div>
             </div>
@@ -100,54 +111,64 @@
         <p v-else class="p-6 text-gray-500">No hay mesas registradas.</p>
       </div>
 
-      <!-- Card: Menús -->
       <div
-        class="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden animate-slide-up"
+        class="bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden animate-slide-up"
       >
-        <div class="p-6 flex justify-between items-center border-b border-gray-200">
-          <h3 class="text-2xl font-bold text-gray-800">Menús</h3>
+        <div class="p-4 flex justify-between items-center border-b border-gray-200">
+          <h3 class="text-xl font-bold text-gray-800">Menús</h3>
           <button
             @click="abrirModalCrearMenu"
-            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            class="bg-teal-500 text-white px-3 py-1.5 rounded-full hover:bg-teal-600 text-sm"
           >
-            Crear Menú
+            + Nuevo Menú
           </button>
         </div>
-        <div class="p-6" v-if="menus.length > 0">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <div class="p-4" v-if="menuStore.menus.length > 0">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div
-              v-for="menu in menus"
+              v-for="menu in menuStore.menus"
               :key="menu.id"
-              class="bg-gray-50 p-4 rounded-lg shadow-sm transition-transform duration-300 hover:scale-105"
+              class="rounded-lg border border-gray-200 bg-white overflow-hidden flex flex-col h-[230px] shadow-sm hover:shadow-md transition-all"
             >
-              <p class="text-lg font-semibold">{{ menu.nombreItem }}</p>
-              <p class="text-sm text-gray-600">{{ menu.descripcion }}</p>
-              <p class="text-sm text-gray-600">Precio: ${{ menu.precio }}</p>
-              <p class="text-sm text-gray-600">
-                {{ menu.disponible ? 'Disponible' : 'No disponible' }}
-              </p>
-              <div class="flex space-x-2 mt-2">
-                <button
-                  @click="abrirModalEditarMenu(menu)"
-                  class="text-blue-500 hover:text-blue-700 transition-colors"
-                >
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button
-                  @click="eliminarMenu(menu.id)"
-                  class="text-red-500 hover:text-red-700 transition-colors"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
+              <!-- Imagen superior -->
+              <div
+                class="h-24 bg-cover bg-center"
+                :style="{
+                  backgroundImage: `url('${menu.imagen?.startsWith('data') || menu.imagen?.startsWith('http') ? menu.imagen : defaultImage}')`,
+                }"
+              ></div>
+
+              <!-- Info -->
+              <div class="flex flex-col justify-between flex-grow px-3 py-2 text-sm">
+                <div class="space-y-0.5">
+                  <h4 class="font-bold text-gray-800 truncate">{{ menu.nombreItem }}</h4>
+                  <p class="text-gray-600 line-clamp-2">{{ menu.descripcion }}</p>
+                  <p class="text-gray-700 font-medium">💰 ${{ menu.precio }}</p>
+                  <p :class="menu.disponible ? 'text-green-600' : 'text-red-500'">
+                    {{ menu.disponible ? '🟢 Disponible' : '🔴 No disponible' }}
+                  </p>
+                </div>
+
+                <div class="flex justify-end space-x-2 mt-2">
+                  <button
+                    @click="abrirModalEditarMenu(menu)"
+                    class="text-blue-500 hover:text-blue-700"
+                    title="Editar"
+                  >
+                    <i class="fas fa-pen"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <p v-else class="p-6 text-gray-500">No hay menús registrados.</p>
+
+        <p v-else class="p-4 text-gray-500">No hay menús registrados.</p>
       </div>
     </template>
+
     <template v-else>
-      <!-- Estado de carga -->
       <div class="flex justify-center items-center h-64">
         <div
           class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"
@@ -156,7 +177,7 @@
       </div>
     </template>
 
-    <!-- Modales para Mesas y Menús -->
+    <!-- Modales de Mesa -->
     <ModalCrearMesa
       v-if="mostrarModalCrearMesa"
       @cerrar="cerrarModalCrearMesa"
@@ -166,12 +187,20 @@
       v-if="mostrarModalEditarMesa"
       :mesa="mesaSeleccionada"
       @cerrar="cerrarModalEditarMesa"
+      @mesa-editada="actualizarMesas"
     />
-    <ModalCrearMenu v-if="mostrarModalCrearMenu" @cerrar="cerrarModalCrearMenu" />
+
+    <!-- Modales de Menú -->
+    <ModalCrearMenu
+      v-if="mostrarModalCrearMenu"
+      @cerrar="cerrarModalCrearMenu"
+      @menu-creado="actualizarMenus"
+    />
     <ModalEditarMenu
       v-if="mostrarModalEditarMenu"
       :menu="menuSeleccionado"
       @cerrar="cerrarModalEditarMenu"
+      @menu-editado="actualizarMenus"
     />
   </div>
 </template>
@@ -180,27 +209,45 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { hostessService } from '@/services/hostessService'
-import ModalCrearMesa from '@/components/ModalCrearMesa.vue'
+import { useMenuStore } from '@/stores/menuStore'
 
+// Modales
+import ModalCrearMesa from '@/components/ModalCrearMesa.vue'
+import ModalEditarMesa from '@/components/ModalEditarMesa.vue'
+import ModalCrearMenu from '@/components/ModalCrearMenu.vue'
+import ModalEditarMenu from '@/components/ModalEditarMenu.vue'
+
+// Estados locales
 const route = useRoute()
 const restaurante = ref(null)
 const mesas = ref([])
-const menus = ref([])
 
+// Store de menús
+const menuStore = useMenuStore()
+
+// Control de modales
 const mostrarModalCrearMesa = ref(false)
 const mostrarModalEditarMesa = ref(false)
 const mostrarModalCrearMenu = ref(false)
 const mostrarModalEditarMenu = ref(false)
+
+// Elementos seleccionados para edición
 const mesaSeleccionada = ref(null)
 const menuSeleccionado = ref(null)
 
-// Función para cargar datos al montar la vista
+const defaultImage =
+  'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=400&q=80' // puedes cambiarla a tu gusto
+
+// Cargar datos al montar
 const cargarDatos = async () => {
   const restauranteId = Number(route.params.id)
   if (restauranteId) {
+    // 1) Datos del restaurante y mesas
     restaurante.value = await hostessService.getRestauranteById(restauranteId)
     mesas.value = await hostessService.getMesasByRestauranteId(restauranteId)
-    menus.value = await hostessService.getMenusByRestauranteId(restauranteId)
+
+    // 2) Menús desde el store
+    await menuStore.fetchMenusByRestaurantId(restauranteId)
   }
 }
 
@@ -208,13 +255,19 @@ onMounted(async () => {
   await cargarDatos()
 })
 
-// Función para actualizar las mesas tras crear una nueva
+// Actualizar mesas tras crear/editar
 const actualizarMesas = async () => {
   const restauranteId = Number(route.params.id)
   mesas.value = await hostessService.getMesasByRestauranteId(restauranteId)
 }
 
-// Funciones para Mesas
+// Actualizar menús tras crear/editar/eliminar
+const actualizarMenus = async () => {
+  const restauranteId = Number(route.params.id)
+  await menuStore.fetchMenusByRestaurantId(restauranteId)
+}
+
+// Funciones Mesa
 const abrirModalCrearMesa = () => {
   mostrarModalCrearMesa.value = true
 }
@@ -228,16 +281,8 @@ const cerrarModalCrearMesa = () => {
 const cerrarModalEditarMesa = () => {
   mostrarModalEditarMesa.value = false
 }
-const eliminarMesa = async (mesaId) => {
-  try {
-    await hostessService.eliminarMesa(mesaId)
-    mesas.value = mesas.value.filter((mesa) => mesa.mesaId !== mesaId)
-  } catch (error) {
-    console.error('Error al eliminar la mesa:', error)
-  }
-}
 
-// Funciones para Menús
+// Funciones Menú
 const abrirModalCrearMenu = () => {
   mostrarModalCrearMenu.value = true
 }
@@ -251,10 +296,10 @@ const cerrarModalCrearMenu = () => {
 const cerrarModalEditarMenu = () => {
   mostrarModalEditarMenu.value = false
 }
-const eliminarMenu = async (menuId) => {
+
+const eliminarMenu = async (menuId: number) => {
   try {
-    await hostessService.eliminarMenu(menuId)
-    menus.value = menus.value.filter((menu) => menu.id !== menuId)
+    await menuStore.deleteMenuItem(menuId)
   } catch (error) {
     console.error('Error al eliminar el menú:', error)
   }
@@ -262,7 +307,6 @@ const eliminarMenu = async (menuId) => {
 </script>
 
 <style scoped>
-/* Animaciones personalizadas */
 @keyframes fade-in {
   from {
     opacity: 0;

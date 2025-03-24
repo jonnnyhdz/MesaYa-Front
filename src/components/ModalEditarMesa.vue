@@ -1,15 +1,15 @@
 <template>
   <div class="fixed inset-0 flex justify-center items-center bg-opacity-25 backdrop-blur-sm">
     <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-lg animate-modal">
-      <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Crear Mesa</h3>
-      <form @submit.prevent="crearMesa">
+      <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Editar Mesa</h3>
+      <form @submit.prevent="editarMesa">
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >Número de Mesa</label
             >
             <input
-              v-model.number="mesa.mesaNumero"
+              v-model.number="mesaLocal.mesaNumero"
               type="number"
               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
@@ -20,7 +20,7 @@
               >Capacidad</label
             >
             <input
-              v-model.number="mesa.capacidad"
+              v-model.number="mesaLocal.capacidad"
               type="number"
               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
@@ -31,7 +31,7 @@
               >Disponible</label
             >
             <select
-              v-model="mesa.disponible"
+              v-model="mesaLocal.disponible"
               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 shadow-sm focus:ring-blue-500 focus:border-blue-500"
               required
             >
@@ -52,7 +52,7 @@
             type="submit"
             class="px-4 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors"
           >
-            Crear
+            Guardar
           </button>
         </div>
       </form>
@@ -61,44 +61,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
 import { hostessService } from '@/services/hostessService'
 import Swal from 'sweetalert2'
 
-const route = useRoute()
-const emit = defineEmits(['cerrar', 'mesa-creada'])
+const props = defineProps<{ mesa: any }>()
+const emit = defineEmits(['cerrar', 'mesa-editada'])
 
-const mesa = ref({
-  mesaNumero: 0,
-  capacidad: 0,
-  disponible: true,
-  restauranteId: Number(route.params.id),
-})
+const mesaLocal = ref({ ...props.mesa })
 
-const crearMesa = async () => {
+watch(
+  () => props.mesa,
+  (newMesa) => {
+    mesaLocal.value = { ...newMesa }
+  },
+)
+
+const editarMesa = async () => {
   try {
-    const mesaCreada = await hostessService.crearMesa(mesa.value)
+    const mesaActualizada = await hostessService.editarMesa(mesaLocal.value)
     Swal.fire({
+      title: 'Mesa actualizada',
+      text: 'La mesa se ha actualizado correctamente.',
       icon: 'success',
-      title: 'Mesa creada',
-      text: 'La mesa se ha creado correctamente.',
       timer: 1500,
       timerProgressBar: true,
       showConfirmButton: false,
     })
-    emit('mesa-creada', mesaCreada)
+    emit('mesa-editada', mesaActualizada)
     emit('cerrar')
   } catch (error) {
     Swal.fire({
-      icon: 'error',
       title: 'Error',
-      text: 'No se pudo crear la mesa. Por favor, inténtalo de nuevo.',
+      text: 'No se pudo actualizar la mesa. Por favor, inténtalo de nuevo.',
+      icon: 'error',
       timer: 1500,
       timerProgressBar: true,
       showConfirmButton: false,
     })
-    console.error('Error al crear la mesa:', error)
+    console.error('Error al editar la mesa:', error)
   }
 }
 </script>

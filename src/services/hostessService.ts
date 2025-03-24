@@ -47,13 +47,33 @@ export const hostessService = {
     }
   },
 
-  async crearMesa(mesa: IMesa): Promise<void> {
+  async crearMesa(mesa: IMesa): Promise<IMesa> {
     try {
       const response = await axios.post(`${API_URL}/Mesa/crear`, mesa)
-      console.log('Respuesta del backend:', response.data) // Verifica la respuesta del backend
+      console.log('Respuesta del backend:', response.data)
       return response.data
     } catch (error) {
       console.error('Error al crear la mesa:', error)
+      throw error
+    }
+  },
+
+  async editarMesa(mesa: IMesa): Promise<IMesa> {
+    try {
+      const response = await axios.put(`${API_URL}/Mesa/${mesa.mesaId}`, mesa)
+      return response.data
+    } catch (error) {
+      console.error('Error al editar la mesa:', error)
+      throw error
+    }
+  },
+
+  async eliminarMesa(id: number): Promise<void> {
+    try {
+      const response = await axios.patch(`${API_URL}/Mesa/soft-delete/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('Error al eliminar la mesa:', error)
       throw error
     }
   },

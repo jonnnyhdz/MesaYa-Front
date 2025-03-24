@@ -67,9 +67,9 @@ const menuItems = {
     { label: 'Historial', path: '/historial', icon: 'fas fa-history' },
   ],
   Hostess: [
-    { label: 'Inicio', path: '/dashboard-hostess', icon: 'fas fa-home' },
-    { label: 'Reservas', path: '/reservas', icon: 'fas fa-calendar-check' },
-    { label: 'Disponibles', path: '/disponibles', icon: 'fas fa-chair' },
+    { label: 'Restaurantes', path: '/dashboard-hostess', icon: 'fas fa-home' },
+    // { label: 'Reservas', path: '/reservas', icon: 'fas fa-calendar-check' },
+    // { label: 'Disponibles', path: '/disponibles', icon: 'fas fa-chair' },
   ],
 }
 

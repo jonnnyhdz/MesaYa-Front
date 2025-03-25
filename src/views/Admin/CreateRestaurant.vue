@@ -1,66 +1,63 @@
 <template>
-  <div class="p-8">
-    <div class="flex justify-between items-center mb-5">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white italic">Nuevo Restaurante</h2>
-    </div>
-
+  <div class="fixed inset-0 flex justify-center items-center bg-opacity-30 backdrop-blur-md z-50">
     <div
-      class="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg animate-fade-in max-w-full mx-auto"
+      class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all scale-95 animate-fade-in-up"
     >
-      <form @submit.prevent="submitForm" class="space-y-6">
-        <div class="grid grid-cols-2 gap-4">
+      <div class="flex justify-between items-center px-6 pt-6">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Nuevo Restaurante</h2>
+        <button @click="$emit('cerrar')" class="text-gray-500 hover:text-red-600 text-xl">
+          ✖
+        </button>
+      </div>
+
+      <form @submit.prevent="submitForm" class="p-6 space-y-6">
+        <div class="grid md:grid-cols-2 gap-6">
           <div>
             <input
               v-model="restaurant.nombre"
               type="text"
               placeholder="Nombre"
-              class="input"
-              required
+              class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
             />
-            <span v-if="v$.nombre.$error" class="text-red-500 text-sm">{{
-              getErrorMessage('nombre')
-            }}</span>
+            <p v-if="v$.nombre.$error" class="text-sm text-red-500 mt-1">
+              {{ getErrorMessage('nombre') }}
+            </p>
           </div>
-
           <div>
             <input
               v-model="restaurant.direccion"
               type="text"
               placeholder="Dirección"
-              class="input"
-              required
+              class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
             />
-            <span v-if="v$.direccion.$error" class="text-red-500 text-sm">{{
-              getErrorMessage('direccion')
-            }}</span>
+            <p v-if="v$.direccion.$error" class="text-sm text-red-500 mt-1">
+              {{ getErrorMessage('direccion') }}
+            </p>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid md:grid-cols-2 gap-6">
           <div>
             <input
               v-model="restaurant.telefono"
               type="text"
               placeholder="Teléfono"
-              class="input"
-              required
+              class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
             />
-            <span v-if="v$.telefono.$error" class="text-red-500 text-sm">{{
-              getErrorMessage('telefono')
-            }}</span>
+            <p v-if="v$.telefono.$error" class="text-sm text-red-500 mt-1">
+              {{ getErrorMessage('telefono') }}
+            </p>
           </div>
-
           <div>
             <input
               v-model="restaurant.horario"
               type="text"
               placeholder="Horario"
-              class="input"
-              required
+              class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
             />
-            <span v-if="v$.horario.$error" class="text-red-500 text-sm">{{
-              getErrorMessage('horario')
-            }}</span>
+            <p v-if="v$.horario.$error" class="text-sm text-red-500 mt-1">
+              {{ getErrorMessage('horario') }}
+            </p>
           </div>
         </div>
 
@@ -69,32 +66,31 @@
             v-model="restaurant.imagen"
             type="text"
             placeholder="URL de Imagen"
-            class="input"
-            required
+            class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
           />
-          <span v-if="v$.imagen.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('imagen')
-          }}</span>
+          <p v-if="v$.imagen.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('imagen') }}
+          </p>
         </div>
 
         <div>
           <textarea
             v-model="restaurant.descripcion"
             placeholder="Descripción"
-            class="input h-24 resize-none"
-            required
+            class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 h-28 resize-none focus:ring-2 focus:ring-green-400 focus:outline-none"
           ></textarea>
-          <span v-if="v$.descripcion.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('descripcion')
-          }}</span>
+          <p v-if="v$.descripcion.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('descripcion') }}
+          </p>
         </div>
 
         <div>
-          <label class="text-sm text-gray-500 dark:text-gray-300 mb-2 block"
-            >Encargado (Hostess)</label
+          <label class="text-base text-gray-600 mb-1 block">Encargado (Hostess)</label>
+          <select
+            v-model="restaurant.usuarioId"
+            class="w-full text-lg py-3 px-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
           >
-          <select v-model="restaurant.usuarioId" class="input" required>
-            <option value="" disabled>Selecciona un Hostess</option>
+            <option disabled value="">Selecciona un Hostess</option>
             <option
               v-for="hostess in userStore.hostessUsers"
               :key="hostess.usuarioId"
@@ -103,17 +99,24 @@
               {{ hostess.username }}
             </option>
           </select>
-          <span v-if="v$.usuarioId.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('usuarioId')
-          }}</span>
+          <p v-if="v$.usuarioId.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('usuarioId') }}
+          </p>
         </div>
 
-        <div class="flex justify-end space-x-3">
-          <button type="submit" class="btn-primary">
-            <i class="fas fa-save mr-2"></i> Guardar
+        <div class="flex justify-end gap-4 pt-2">
+          <button
+            type="button"
+            @click="$emit('cerrar')"
+            class="bg-gray-500 hover:bg-gray-600 text-white text-base font-medium px-6 py-3 rounded-full"
+          >
+            <i class="fas fa-times mr-2"></i> Cancelar
           </button>
-          <button @click="goBack" type="button" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Cancelar
+          <button
+            type="submit"
+            class="bg-teal-500 hover:bg-teal-600 text-white text-base font-medium px-6 py-3 rounded-full"
+          >
+            <i class="fas fa-save mr-2"></i> Guardar
           </button>
         </div>
       </form>
@@ -125,14 +128,14 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRestaurantStore } from '@/stores/restaurantStore'
 import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
 import { showSuccessAlert, showErrorAlert } from '@/utils/swalUtils'
 import useVuelidate from '@vuelidate/core'
 import { required, minLength, maxLength, url, numeric } from '@vuelidate/validators'
 
+const emit = defineEmits(['cerrar', 'restaurante-creado'])
+
 const restaurantStore = useRestaurantStore()
 const userStore = useUserStore()
-const router = useRouter()
 
 const restaurant = ref({
   nombre: '',
@@ -146,8 +149,8 @@ const restaurant = ref({
 
 const validationMessages = {
   required: 'Este campo es obligatorio.',
-  minLength: (length) => `Debe contener al menos ${length} caracteres.`,
-  maxLength: (length) => `Debe contener como máximo ${length} caracteres.`,
+  minLength: (l) => `Debe contener al menos ${l} caracteres.`,
+  maxLength: (l) => `Debe contener como máximo ${l} caracteres.`,
   numeric: 'Solo se permiten números.',
   url: 'Debe ser una URL válida.',
 }
@@ -166,24 +169,18 @@ const v$ = useVuelidate(rules, restaurant)
 
 const getErrorMessage = (field) => {
   if (!v$.value[field].$error) return ''
-
   const error = v$.value[field].$errors[0]
   if (error.$validator === 'required') return validationMessages.required
   if (error.$validator === 'minLength') return validationMessages.minLength(error.$params.min)
   if (error.$validator === 'maxLength') return validationMessages.maxLength(error.$params.max)
   if (error.$validator === 'numeric') return validationMessages.numeric
   if (error.$validator === 'url') return validationMessages.url
-
   return 'Error desconocido.'
 }
 
 onMounted(() => {
   userStore.fetchHostessUsers()
 })
-
-const goBack = () => {
-  router.push('/restaurantes-admin')
-}
 
 const submitForm = async () => {
   v$.value.$touch()
@@ -195,53 +192,27 @@ const submitForm = async () => {
   try {
     await restaurantStore.createRestaurant(restaurant.value)
     showSuccessAlert('El restaurante ha sido agregado correctamente.')
-    setTimeout(() => router.push('/restaurantes-admin'), 2000)
+    emit('restaurante-creado')
+    emit('cerrar')
   } catch (error) {
     showErrorAlert('No se pudo agregar el restaurante.')
   }
 }
 </script>
+
 <style scoped>
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  color: #333;
-  transition: all 0.3s ease-in-out;
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.input:focus {
-  border-color: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
-  outline: none;
-}
-
-.btn-primary {
-  background-color: #34d399;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-
-.btn-primary:hover {
-  background-color: #2f9e79;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }
 </style>

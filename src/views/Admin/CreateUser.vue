@@ -1,67 +1,73 @@
 <template>
-  <div class="p-8">
-    <div class="flex justify-between items-center mb-5">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white italic">Nuevo Usuario</h2>
-    </div>
-
+  <div class="fixed inset-0 flex justify-center items-center bg-opacity-30 backdrop-blur-md z-50">
     <div
-      class="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg animate-fade-in max-w-full mx-auto"
+      class="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg transform transition-all scale-95 animate-fade-in-up p-6"
     >
-      <form @submit.prevent="submitForm" class="space-y-6">
-        <!-- Campo para el nombre de usuario -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Usuario</h2>
+        <button @click="$emit('cerrar')" class="text-gray-500 hover:text-red-600 text-xl">
+          ✖
+        </button>
+      </div>
+
+      <form @submit.prevent="submitForm" class="space-y-5 relative">
         <div>
           <input
             v-model="userData.username"
             type="text"
             placeholder="Nombre de usuario"
-            class="input"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-green-400 focus:outline-none"
             :class="{ 'border-red-500': v$.username.$error }"
           />
-          <span v-if="v$.username.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('username')
-          }}</span>
+          <p v-if="v$.username.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('username') }}
+          </p>
         </div>
 
-        <!-- Campo para el correo electrónico -->
         <div>
           <input
             v-model="userData.email"
             type="email"
             placeholder="Correo electrónico"
-            class="input"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-green-400 focus:outline-none"
             :class="{ 'border-red-500': v$.email.$error }"
           />
-          <span v-if="v$.email.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('email')
-          }}</span>
+          <p v-if="v$.email.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('email') }}
+          </p>
         </div>
 
-        <!-- Campo para la contraseña -->
-        <div>
+        <div class="relative">
           <input
             v-model="userData.password"
             :type="showPassword ? 'text' : 'password'"
             placeholder="Contraseña"
-            class="input"
+            class="w-full rounded-xl border border-gray-300 px-4 py-3 pr-10 focus:ring-2 focus:ring-green-400 focus:outline-none"
             :class="{ 'border-red-500': v$.password.$error }"
           />
           <i
             :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"
-            class="absolute right-5 top-4 text-gray-400 dark:text-gray-500 cursor-pointer transition-all duration-300 hover:text-blue-500"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 cursor-pointer hover:text-blue-500"
             @click="togglePassword"
           ></i>
-          <span v-if="v$.password.$error" class="text-red-500 text-sm">{{
-            getErrorMessage('password')
-          }}</span>
+          <p v-if="v$.password.$error" class="text-sm text-red-500 mt-1">
+            {{ getErrorMessage('password') }}
+          </p>
         </div>
 
-        <!-- Botones de acción -->
-        <div class="flex justify-end space-x-3">
-          <button @click="goBack" type="button" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Cancelar
+        <div class="flex justify-end gap-4 pt-4">
+          <button
+            type="button"
+            @click="$emit('cerrar')"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-times mr-2"></i>Cancelar
           </button>
-          <button type="submit" class="btn-primary">
-            <i class="fas fa-save mr-2"></i> Guardar
+          <button
+            type="submit"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-save mr-2"></i>Guardar
           </button>
         </div>
       </form>
@@ -72,76 +78,51 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
 import { showSuccessAlert, showErrorAlert } from '@/utils/swalUtils'
 import useVuelidate from '@vuelidate/core'
 import { required, minLength, maxLength, email } from '@vuelidate/validators'
 
+const emit = defineEmits(['cerrar', 'usuario-creado'])
 const userStore = useUserStore()
-const router = useRouter()
 
 const userData = ref({
-  username: '', // Nombre de usuario
-  email: '', // Correo electrónico
-  password: '', // Contraseña
+  username: '',
+  email: '',
+  password: '',
 })
 
 const showPassword = ref(false)
 
-// Reglas de validación
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
 const rules = computed(() => ({
-  username: {
-    required,
-    minLength: minLength(3),
-    maxLength: maxLength(50),
-  },
-  email: {
-    required,
-    email,
-  },
-  password: {
-    required,
-    minLength: minLength(8),
-    maxLength: maxLength(20),
-  },
+  username: { required, minLength: minLength(3), maxLength: maxLength(50) },
+  email: { required, email },
+  password: { required, minLength: minLength(8), maxLength: maxLength(20) },
 }))
 
-const v$ = useVuelidate(rules, userData)
-
-// Mensajes de error personalizados
 const validationMessages = {
   required: 'Este campo es obligatorio.',
-  minLength: (length) => `Debe contener al menos ${length} caracteres.`,
-  maxLength: (length) => `Debe contener como máximo ${length} caracteres.`,
+  minLength: (l) => `Debe contener al menos ${l} caracteres.`,
+  maxLength: (l) => `Debe contener como máximo ${l} caracteres.`,
   email: 'Debe ser un correo electrónico válido.',
 }
 
-// Obtener mensajes de error
+const v$ = useVuelidate(rules, userData)
+
 const getErrorMessage = (field) => {
   if (!v$.value[field].$error) return ''
-
   const error = v$.value[field].$errors[0]
   if (error.$validator === 'required') return validationMessages.required
   if (error.$validator === 'minLength') return validationMessages.minLength(error.$params.min)
   if (error.$validator === 'maxLength') return validationMessages.maxLength(error.$params.max)
   if (error.$validator === 'email') return validationMessages.email
-
   return 'Error desconocido.'
 }
 
-// Mostrar/ocultar contraseña
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
-
-// Volver a la vista anterior
-const goBack = () => {
-  router.push('/gestionUsers')
-}
-
-// Enviar el formulario
 const submitForm = async () => {
-  // Validar el formulario
   v$.value.$touch()
   if (v$.value.$invalid) {
     showErrorAlert('Por favor, completa todos los campos correctamente.')
@@ -150,8 +131,9 @@ const submitForm = async () => {
 
   try {
     await userStore.registerUser(userData.value)
-    showSuccessAlert('El usuario ha sido registrado correctamente.')
-    setTimeout(() => router.push('/gestionUsers'), 2000)
+    showSuccessAlert('Usuario registrado correctamente.')
+    emit('usuario-creado')
+    emit('cerrar')
   } catch (error) {
     showErrorAlert('No se pudo registrar el usuario.')
   }
@@ -159,50 +141,17 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  color: #333;
-  transition: all 0.3s ease-in-out;
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-
-.input:focus {
-  border-color: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
-  outline: none;
-}
-
-.input.border-red-500 {
-  border-color: #ef4444;
-}
-
-.btn-primary {
-  background-color: #34d399;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-
-.btn-primary:hover {
-  background-color: #2f9e79;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }
 </style>

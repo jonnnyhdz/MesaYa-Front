@@ -13,12 +13,12 @@
           Cerrados: {{ restaurantStore.totalCerrados }}
         </span>
 
-        <router-link
-          to="/createRestaurant"
+        <button
+          @click="mostrarModal = true"
           class="bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-700 transition-all shadow-md"
         >
-          + Agregar Restaurante
-        </router-link>
+          + Agregar
+        </button>
       </div>
     </div>
 
@@ -48,12 +48,8 @@
             <td class="py-4 px-4 text-gray-700 dark:text-gray-300">{{ restaurant.encargado }}</td>
             <td class="py-4 px-4 text-center">
               <span
-                :class="
-                  restaurant.estado === 'Abierto'
-                    ? 'bg-green-500 text-white'
-                    : 'bg-red-500 text-white'
-                "
-                class="px-3 py-1 rounded-full text-sm font-semibold"
+                :class="restaurant.estado === 'Abierto' ? 'bg-green-500' : 'bg-red-500'"
+                class="text-white px-3 py-1 rounded-full text-sm font-semibold"
               >
                 {{ restaurant.estado }}
               </span>
@@ -78,7 +74,7 @@
 
                 <button
                   class="bg-blue-500 text-white px-3 py-2 rounded-full shadow-md hover:bg-blue-600 transition-all"
-                  @click="goToDetails(restaurant.id)"
+                  @click="abrirModalEditar(restaurant.id)"
                 >
                   <i class="fas fa-eye"></i>
                 </button>
@@ -110,25 +106,58 @@
         »
       </button>
     </div>
+
+    <ModalCrearRestaurante
+      v-if="mostrarModal"
+      @cerrar="mostrarModal = false"
+      @restaurante-creado="handleRestauranteCreado"
+    />
+
+    <ModalEditarRestaurante
+      v-if="mostrarModalEditar"
+      :id="restauranteSeleccionadoId"
+      @cerrar="mostrarModalEditar = false"
+      @restaurante-actualizado="handleRestauranteEditado"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRestaurantStore } from '@/stores/restaurantStore'
 import { useRouter } from 'vue-router'
 import { showDeleteConfirm, showSuccessAlert, showErrorAlert } from '@/utils/swalUtils'
 
+import ModalCrearRestaurante from '../Admin/CreateRestaurant.vue'
+import ModalEditarRestaurante from '../Admin/RestaurantDetail.vue'
+
 const restaurantStore = useRestaurantStore()
 const router = useRouter()
+
+const mostrarModal = ref(false)
+const mostrarModalEditar = ref(false)
+const restauranteSeleccionadoId = ref(null)
+
+onMounted(() => {
+  restaurantStore.fetchRestaurants()
+})
 
 const goToDetails = (id) => {
   router.push(`/restaurante/${id}`)
 }
 
-onMounted(() => {
+const handleRestauranteCreado = () => {
   restaurantStore.fetchRestaurants()
-})
+}
+
+const handleRestauranteEditado = () => {
+  restaurantStore.fetchRestaurants()
+}
+
+const abrirModalEditar = (id) => {
+  restauranteSeleccionadoId.value = id
+  mostrarModalEditar.value = true
+}
 
 const deleteRestaurant = async (id) => {
   showDeleteConfirm(async () => {
@@ -144,11 +173,8 @@ const deleteRestaurant = async (id) => {
 const toggleState = async (restaurantId) => {
   try {
     const restaurant = restaurantStore.paginatedRestaurants.find((r) => r.id === restaurantId)
-
     const newState = restaurant.estado === 'Cerrado' ? 'Abierto' : 'Cerrado'
-
     await restaurantStore.updateRestaurantState(restaurantId, newState)
-
     restaurantStore.fetchRestaurants()
     showSuccessAlert(`El restaurante ha sido ${newState.toLowerCase()} exitosamente.`)
   } catch (error) {

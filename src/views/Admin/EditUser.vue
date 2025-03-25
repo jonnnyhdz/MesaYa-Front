@@ -1,72 +1,140 @@
 <template>
-  <div class="p-8">
-    <div class="flex justify-between items-center mb-5">
-      <h2 class="text-xl font-bold text-gray-900 dark:text-white italic">Editar Usuario</h2>
-    </div>
+  <div class="fixed inset-0 flex justify-center items-center bg-opacity-30 backdrop-blur-md z-50">
     <div
-      class="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-lg animate-fade-in max-w-full mx-auto"
+      class="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-3xl transform transition-all scale-95 animate-fade-in-up p-6"
     >
-      <div v-if="user">
-        <form @submit.prevent="submitForm" class="space-y-6">
-          <!-- Nombre de usuario -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Editar Usuario</h2>
+        <button @click="$emit('cerrar')" class="text-gray-500 hover:text-red-600 text-xl">
+          ✖
+        </button>
+      </div>
+
+      <div
+        v-if="!isEditing"
+        class="flex items-center gap-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-md px-4 py-2 text-sm mb-4"
+      >
+        <i class="fas fa-info-circle"></i>
+        <span>
+          Para editar los campos, haz clic en el botón
+          <strong>Editar</strong> y luego en <strong>Guardar</strong>.
+        </span>
+      </div>
+
+      <form @submit.prevent="submitForm" class="space-y-5">
+        <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
-            <input v-model="form.username" type="text" class="input" />
-          </div>
-          <!-- Correo electrónico -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-            <input v-model="form.email" type="email" class="input" />
-          </div>
-          <!-- Contraseña (opcional) -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
+              >Nombre de Usuario</label
+            >
             <input
-              v-model="form.passwordHash"
-              type="password"
-              class="input"
-              placeholder="Dejar en blanco para no cambiar"
+              v-model="form.username"
+              type="text"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              :disabled="!isEditing"
             />
           </div>
-          <!-- Estado -->
+
           <div>
-            <label class="block text-sm font-medium text-gray-700">Estado</label>
-            <select v-model="form.isDeleted" class="input">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
+              >Correo Electrónico</label
+            >
+            <input
+              v-model="form.email"
+              type="email"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              :disabled="!isEditing"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
+            >Contraseña</label
+          >
+          <input
+            v-model="form.passwordHash"
+            type="password"
+            placeholder="Dejar en blanco para no cambiar"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+            :disabled="!isEditing"
+          />
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
+              >Estado</label
+            >
+            <select
+              v-model="form.isDeleted"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              :disabled="!isEditing"
+            >
               <option :value="false">Activo</option>
               <option :value="true">Inactivo</option>
             </select>
           </div>
-          <!-- Rol -->
+
           <div>
-            <label class="block text-sm font-medium text-gray-700">Rol</label>
-            <select v-model="form.roleIds[0]" class="input">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1"
+              >Rol</label
+            >
+            <select
+              v-model="form.roleIds[0]"
+              class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              :disabled="!isEditing"
+            >
               <option value="1">Admin</option>
               <option value="2">Usuario</option>
               <option value="3">Hostess</option>
             </select>
           </div>
-          <div class="flex justify-end space-x-3">
-            <button type="button" class="btn-secondary" @click="goBack">
-              <i class="fas fa-arrow-left mr-2"></i>Cancelar
-            </button>
-            <button type="submit" class="btn-primary">
-              <i class="fas fa-save mr-2"></i>Guardar Cambios
-            </button>
-          </div>
-        </form>
-      </div>
-      <div v-else>
-        <p>Cargando datos del usuario...</p>
-      </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-4">
+          <button
+            type="button"
+            @click="$emit('cerrar')"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-times mr-2"></i>Cancelar
+          </button>
+
+          <button
+            v-if="isEditing"
+            type="submit"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-save mr-2"></i>Guardar
+          </button>
+
+          <button
+            v-else
+            type="button"
+            @click="enableEditing"
+            class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-edit mr-2"></i>Editar
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { userService } from '@/services/userService'
-import { showSuccessAlert, showErrorAlert } from '@/utils/swalUtils'
+import { showSuccessAlert, showErrorAlert, showEditModeAlert } from '@/utils/swalUtils'
+
+const props = defineProps({
+  id: { type: Number, required: true },
+})
+
+const emit = defineEmits(['cerrar', 'usuario-editado'])
+
+const isEditing = ref(false)
 
 interface EditUserForm {
   usuarioId: number | null
@@ -76,10 +144,6 @@ interface EditUserForm {
   isDeleted: boolean
   roleIds: number[]
 }
-
-const route = useRoute()
-const router = useRouter()
-const userId = Number(route.params.userId)
 
 const user = ref<any>(null)
 const form = ref<EditUserForm>({
@@ -93,85 +157,64 @@ const form = ref<EditUserForm>({
 
 onMounted(async () => {
   try {
-    if (!userId) throw new Error('El ID del usuario no fue proporcionado.')
-
-    const data = await userService.getUserById(userId)
+    const data = await userService.getUserById(props.id)
     user.value = data
 
     form.value.usuarioId = data.usuarioId
     form.value.username = data.username
     form.value.email = data.email
-    form.value.passwordHash = '' // Se deja en blanco visualmente, pero se usará el original si no se cambia
+    form.value.passwordHash = ''
     form.value.isDeleted = data.isDeleted
     form.value.roleIds = data.roles?.$values || [2]
 
-    // Guardamos también la contraseña original para usarla si no se edita
     user.value.passwordHash = data.passwordHash
   } catch (error) {
     showErrorAlert('No se pudo cargar el usuario.')
-    console.error(error)
-    router.push('/gestionUsers')
+    emit('cerrar')
   }
 })
 
+const enableEditing = () => {
+  isEditing.value = true
+  showEditModeAlert()
+}
+
 const submitForm = async () => {
   try {
-    const selectedRoleId = parseInt(form.value.roleIds[0]) // 💥 Nos aseguramos de que sea número
-
+    const selectedRoleId = parseInt(form.value.roleIds[0])
     const payload = {
       usuarioId: form.value.usuarioId,
       username: form.value.username.trim() || user.value.username,
       email: form.value.email.trim() || user.value.email,
       isDeleted: form.value.isDeleted,
-      roleIds: [selectedRoleId], // 💥 Aquí lo mandamos asegurado
+      roleIds: [selectedRoleId],
       passwordHash:
         form.value.passwordHash.trim() !== '' ? form.value.passwordHash : user.value.passwordHash,
     }
 
-    const response = await userService.editUser(payload)
-    showSuccessAlert(response.message || 'Usuario editado con éxito.')
-    router.push('/gestionUsers')
+    await userService.editUser(payload)
+    showSuccessAlert('Usuario actualizado correctamente.')
+    emit('usuario-editado')
+    emit('cerrar')
   } catch (error: any) {
     showErrorAlert(error.message || 'No se pudo editar el usuario.')
     console.error(error)
   }
 }
-
-const goBack = () => {
-  router.push('/gestionUsers')
-}
 </script>
 
 <style scoped>
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  color: #333;
-  transition: all 0.3s ease-in-out;
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-.btn-primary {
-  background-color: #34d399;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.btn-primary:hover {
-  background-color: #2f9e79;
-}
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 25px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.btn-secondary:hover {
-  background-color: #4b5563;
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }
 </style>

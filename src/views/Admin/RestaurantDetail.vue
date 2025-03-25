@@ -1,90 +1,124 @@
 <template>
-  <div class="p-8">
-    <div class="flex justify-between items-center mb-3">
-      <h2 class="text-xl italic font-bold text-gray-900 dark:text-white">
-        Detalles del Restaurante
-      </h2>
-    </div>
-
+  <div class="fixed inset-0 flex justify-center items-center bg-opacity-30 backdrop-blur-md z-50">
     <div
-      class="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg animate-fade-in max-w-full mx-auto"
+      class="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-3xl transform transition-all scale-95 animate-fade-in-up p-6"
     >
-      <form class="space-y-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Editar Restaurante</h2>
+        <button @click="$emit('cerrar')" class="text-gray-500 hover:text-red-600 text-xl">
+          ✖
+        </button>
+      </div>
+
+      <div
+        v-if="!isEditing"
+        class="flex items-center gap-2 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-md px-4 py-2 text-sm mb-4"
+      >
+        <i class="fas fa-info-circle"></i>
+        <span>
+          Para editar los campos, haz clic en el botón
+          <strong>Editar</strong> y luego en <strong>Guardar</strong>.
+        </span>
+      </div>
+
+      <form @submit.prevent="saveChanges" class="space-y-5">
         <div class="flex justify-center">
           <img
             :src="restaurant.imagen || 'https://source.unsplash.com/400x300/?restaurant'"
             alt="Imagen del restaurante"
-            class="restaurant-image"
+            class="w-full max-w-md h-40 object-cover rounded-xl shadow"
           />
         </div>
-        <div>
+
+        <input
+          v-model="restaurant.imagen"
+          type="text"
+          placeholder="URL de la imagen"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+          :disabled="!isEditing"
+        />
+
+        <div class="grid md:grid-cols-2 gap-4">
           <input
-            v-model="restaurant.imagen"
+            v-model="restaurant.nombre"
             type="text"
-            placeholder="URL de la imagen"
-            class="input"
+            placeholder="Nombre"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
             :disabled="!isEditing"
           />
-          <label class="label">Imagen (URL)</label>
-        </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <input v-model="restaurant.nombre" type="text" class="input" :disabled="!isEditing" />
-            <label class="label">Nombre</label>
-          </div>
-
-          <div>
-            <input
-              v-model="restaurant.direccion"
-              type="text"
-              class="input"
-              :disabled="!isEditing"
-            />
-            <label class="label">Dirección</label>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <input v-model="restaurant.telefono" type="text" class="input" :disabled="!isEditing" />
-            <label class="label">Teléfono</label>
-          </div>
-
-          <div>
-            <input v-model="restaurant.horario" type="text" class="input" :disabled="!isEditing" />
-            <label class="label">Horario</label>
-          </div>
-        </div>
-
-        <div>
-          <textarea
-            v-model="restaurant.descripcion"
-            class="input h-24 resize-none"
+          <input
+            v-model="restaurant.direccion"
+            type="text"
+            placeholder="Dirección"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
             :disabled="!isEditing"
-          ></textarea>
-          <label class="label">Descripción</label>
+          />
         </div>
 
+        <div class="grid md:grid-cols-2 gap-4">
+          <input
+            v-model="restaurant.telefono"
+            type="text"
+            placeholder="Teléfono"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+            :disabled="!isEditing"
+          />
+
+          <input
+            v-model="restaurant.horario"
+            type="text"
+            placeholder="Horario"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+            :disabled="!isEditing"
+          />
+        </div>
+
+        <textarea
+          v-model="restaurant.descripcion"
+          placeholder="Descripción"
+          class="w-full h-24 rounded-xl border border-gray-300 px-4 py-2 resize-none focus:ring-2 focus:ring-green-400 focus:outline-none"
+          :disabled="!isEditing"
+        ></textarea>
+
         <div>
-          <select v-model="restaurant.userId" class="input" :disabled="!isEditing" required>
-            <option v-if="!restaurant.userId" disabled value="">Selecciona un encargado</option>
+          <label class="block text-sm mb-1 text-gray-700">Encargado (Hostess)</label>
+          <select
+            v-model="restaurant.userId"
+            class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-400 focus:outline-none"
+            :disabled="!isEditing"
+          >
+            <option value="" disabled>Selecciona un encargado</option>
             <option v-for="user in users" :key="user.usuarioId" :value="user.usuarioId">
               {{ user.username }}
             </option>
           </select>
-          <label class="label">Encargado</label>
         </div>
 
-        <div class="flex justify-end space-x-3 mt-6">
-          <button @click="goBack" type="button" class="btn-secondary">
-            <i class="fas fa-arrow-left mr-2"></i> Volver
+        <div class="flex justify-end gap-4 pt-4">
+          <button
+            type="button"
+            @click="$emit('cerrar')"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-times mr-2"></i>Cancelar
           </button>
-          <button v-if="isEditing" @click.prevent="saveChanges" class="btn-primary">
-            <i class="fas fa-save mr-2"></i> Guardar Cambios
+
+          <button
+            v-if="isEditing"
+            type="submit"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-save mr-2"></i>Guardar
           </button>
-          <button v-else @click.prevent="enableEditing" class="btn-edit">
-            <i class="fas fa-edit mr-2"></i> Editar
+
+          <button
+            v-else
+            type="button"
+            @click="enableEditing"
+            class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium rounded-full px-5 py-2"
+          >
+            <i class="fas fa-edit mr-2"></i>Editar
           </button>
         </div>
       </form>
@@ -94,15 +128,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import { restaurantService } from '@/services/restaurantService'
-import { userService } from '@/services/userService' // Importa el servicio de usuarios
+import { userService } from '@/services/userService'
 import { showSuccessAlert, showErrorAlert, showEditModeAlert } from '@/utils/swalUtils'
 
-const route = useRoute()
-const router = useRouter()
+const props = defineProps({
+  id: { type: String, required: true },
+})
+
+const emit = defineEmits(['cerrar', 'restaurante-actualizado'])
+
 const isEditing = ref(false)
-const restaurantId = route.params.id // Aquí se obtiene el id de la URL
 
 const restaurant = ref({
   nombre: '',
@@ -114,12 +150,11 @@ const restaurant = ref({
   userId: null,
 })
 
-const users = ref([]) // Aquí se mantendrán los usuarios disponibles para el encargado
+const users = ref([])
 
 onMounted(async () => {
   try {
-    const data = await restaurantService.getRestaurantById(restaurantId)
-
+    const data = await restaurantService.getRestaurantById(props.id)
     restaurant.value = {
       nombre: data.restauranteNombre,
       direccion: data.direccion,
@@ -127,13 +162,11 @@ onMounted(async () => {
       horario: data.horario,
       imagen: data.imagenUrl,
       descripcion: data.descripcion,
-      userId: data.userId || null, // Aquí se obtiene el ID del encargado
+      userId: data.userId || null,
     }
-
     users.value = await userService.getHostessUsers()
   } catch (error) {
-    showErrorAlert('No se pudieron cargar los detalles del restaurante.')
-    console.error(error)
+    showErrorAlert('No se pudieron cargar los datos del restaurante.')
   }
 })
 
@@ -143,13 +176,6 @@ const enableEditing = () => {
 }
 
 const saveChanges = async () => {
-  console.log('Restaurant Data: ', restaurant.value)
-
-  if (!restaurant.value.nombre || !restaurant.value.userId) {
-    showErrorAlert('El nombre del restaurante y el encargado son obligatorios.')
-    return
-  }
-
   try {
     const updatedRestaurant = {
       restauranteNombre: restaurant.value.nombre,
@@ -161,110 +187,30 @@ const saveChanges = async () => {
       userId: restaurant.value.userId || null,
     }
 
-    await restaurantService.updateRestaurant(restaurantId, updatedRestaurant)
+    await restaurantService.updateRestaurant(props.id, updatedRestaurant)
     isEditing.value = false
-    showSuccessAlert('Los cambios han sido guardados exitosamente.')
-
-    router.push('/restaurantes-admin')
+    showSuccessAlert('Restaurante actualizado correctamente.')
+    emit('restaurante-actualizado')
+    emit('cerrar')
   } catch (error) {
     showErrorAlert('Error al guardar los cambios.')
     console.error(error)
   }
 }
-
-const goBack = () => {
-  router.push('/restaurantes-admin')
-}
 </script>
 
 <style scoped>
-.restaurant-image {
-  width: 500px;
-  height: 150px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  color: #333;
-  transition: all 0.3s ease-in-out;
-}
-
-.input:focus {
-  border-color: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
-  outline: none;
-}
-
-.input.disabled {
-  background-color: #e5e7eb;
-  color: #6b7280;
-}
-
-.label {
-  display: block;
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
-.btn-primary {
-  background-color: #34d399;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.3s ease-in-out;
-}
-
-.btn-primary:hover {
-  background-color: #2f9e79;
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
-}
-
-.btn-edit {
-  background-color: #ffc83ec7;
-  color: black;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.btn-edit:hover {
-  background-color: #f59e0b;
-}
-
-@keyframes fadeIn {
+@keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(20px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
-
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-in-out;
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
 }
 </style>

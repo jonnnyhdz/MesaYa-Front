@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import ModalReserva from '../views/User/ModalReserva.vue'
+import ModalReserva from './User/ModalReserva.vue'
 import { hostessService } from '@/services/hostessService'
 import type { IRestaurant, IMenu, IMesa } from '@/interfaces/RestaurantInterface'
 

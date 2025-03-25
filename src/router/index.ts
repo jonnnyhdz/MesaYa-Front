@@ -14,6 +14,7 @@ import RestaurantDetail from '@/views/Admin/RestaurantDetail.vue'
 import CreateUser from '@/views/Admin/CreateUser.vue'
 import DetallesRestaurante from '@/views/Hostess/DetallesRestaurante.vue'
 import EditUser from '@/views/Admin/EditUser.vue'
+import EditarPerfil from '@/views/User/EditarPerfil.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,6 +81,12 @@ const router = createRouter({
       path: '/dashboard-usuario',
       name: 'dashboardUsuario',
       component: DashboardUsuario,
+      meta: { requiresAuth: true, role: 'Usuario' },
+    },
+    {
+      path: '/editar-perfil',
+      name: 'perfilUsuario',
+      component: EditarPerfil,
       meta: { requiresAuth: true, role: 'Usuario' },
     },
 

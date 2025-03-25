@@ -57,4 +57,14 @@ export const userService = {
       throw new Error('No se pudo editar el usuario')
     }
   },
+
+  async editProfile(usuarioId, userData) {
+    try {
+      const response = await axios.put(`${API_URL}/Usuario/edit-profile/${usuarioId}`, userData)
+      return response.data
+    } catch (error) {
+      console.error('Error al editar el perfil del usuario:', error.response?.data || error)
+      throw new Error('No se pudo editar el perfil')
+    }
+  },
 }

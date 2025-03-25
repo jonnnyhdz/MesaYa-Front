@@ -212,10 +212,10 @@ import { hostessService } from '@/services/hostessService'
 import { useMenuStore } from '@/stores/menuStore'
 
 // Modales
-import ModalCrearMesa from '@/components/ModalCrearMesa.vue'
-import ModalEditarMesa from '@/components/ModalEditarMesa.vue'
-import ModalCrearMenu from '@/components/ModalCrearMenu.vue'
-import ModalEditarMenu from '@/components/ModalEditarMenu.vue'
+import ModalCrearMesa from '../Hostess/ModalCrearMesa.vue'
+import ModalEditarMesa from '../Hostess/ModalEditarMesa.vue'
+import ModalCrearMenu from '../Hostess/ModalCrearMenu.vue'
+import ModalEditarMenu from '../Hostess/ModalEditarMenu.vue'
 
 // Estados locales
 const route = useRoute()

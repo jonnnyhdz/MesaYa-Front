@@ -51,6 +51,7 @@
           <span v-else-if="blockMessageShown">Ya puedes intentar iniciar sesión nuevamente</span>
           <span v-else>Iniciar Sesión</span>
         </button>
+        <RecaptchaV2 class="pl-8" :sitekey=recaptchaKey ref="recaptcha" @load-callback="captcha"/>
       </Form>
 
       <p v-if="errorMessage" class="text-red-500 text-center mt-2">{{ errorMessage }}</p>
@@ -98,6 +99,7 @@ import { signInWithGoogle } from '@/firebaseConfig'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
 import DOMPurify from 'dompurify'
+import { RecaptchaV2 } from "vue3-recaptcha-v2";
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -111,6 +113,14 @@ const blockLevel = ref(parseInt(localStorage.getItem('blockLevel')) || 0)
 const timeLeft = ref(0)
 const blockMessageShown = ref(false)
 const isBlocked = ref(false)
+const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY // Obtiene la clave pública
+const recaptchaToken = ref()
+
+const captcha = (resCaptcha) => {
+  console.log("Token de reCAPTCHA obtenido:", resCaptcha);
+      recaptchaToken.value = resCaptcha; // Guarda el token
+      
+}
 
 // Esquema de validación con sanitización
 const schema = yup.object({
@@ -140,7 +150,7 @@ const handleSubmit = async (values) => {
   const password = DOMPurify.sanitize(values.password)
 
   try {
-    await authStore.login(email, password)
+    await authStore.login(email, password, recaptchaToken.value)
 
     // Éxito: reiniciar datos
     localStorage.removeItem('loginAttempts')
@@ -229,5 +239,10 @@ const goToHome = () => {
 // Verificar bloqueo al montar
 onMounted(() => {
   if (blockUntil.value) updateBlockState()
+  const script = document.createElement('script');
+  script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaKey}`;
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
 })
 </script>

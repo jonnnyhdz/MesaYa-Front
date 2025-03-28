@@ -14,9 +14,9 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async login(email: string, password: string) {
+    async login(email: string, password: string, recaptchaToken:string) {
       try {
-        const { token, role, nombre, usuarioId } = await authService.login(email, password)
+        const { token, role, nombre, usuarioId } = await authService.login(email, password, recaptchaToken)
         this.token = token
         this.role = role
         this.nombre = nombre

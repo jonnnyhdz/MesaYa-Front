@@ -13,9 +13,12 @@ interface DecodedToken {
 }
 
 export const authService = {
-  async login(email: string, password: string) {
+  async login(email: string, password: string,  recaptchaToken:string) {
     try {
-      const response = await axios.post(`${API_URL}/Auth/login`, { email, password })
+      if (!recaptchaToken) {
+        throw new Error('Por favor, completa el CAPTCHA antes de iniciar sesión.');
+      }
+      const response = await axios.post(`${API_URL}/Auth/login`, { email, password, recaptchaToken })
       const { token } = response.data
 
       // Decodificamos el token
@@ -31,9 +34,19 @@ export const authService = {
       if (usuarioId) localStorage.setItem('usuarioId', usuarioId.toString())
 
       return { token, role: userRole, nombre: userName, usuarioId }
-    } catch (error) {
-      console.error('Error en login:', error)
-      throw new Error('Credenciales incorrectas o error en el servidor')
+    } catch (error: unknown) {
+      
+      if (error instanceof Error) {
+        // Si es un Error, tratamos el mensaje de error
+        if (error.message === 'Por favor, completa el CAPTCHA antes de iniciar sesión.') {
+          throw new Error('Por favor, completa el CAPTCHA antes de iniciar sesión.');
+        } else {
+          throw new Error('Credenciales incorrectas o error en el servidor');
+        }
+      } else {
+        // Si el error no es una instancia de Error, lanzamos un error genérico
+        throw new Error('Se produjo un error desconocido');
+      }
     }
   },
 

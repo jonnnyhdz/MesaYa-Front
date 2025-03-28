@@ -16,7 +16,7 @@
             name="email"
             type="email"
             placeholder="Correo electrónico"
-            class="w-full px-5 py-3 rounded-full border bg-gray-50 dark:bg-gray-900 dark:border-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+            class="w-full px-5 py-3 rounded-full border border-gray-300 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
           />
           <ErrorMessage name="email" class="text-red-500 text-sm mt-1" />
           <i class="fas fa-envelope absolute right-5 top-4 text-gray-400 dark:text-gray-500"></i>
@@ -28,7 +28,7 @@
             :type="showPassword ? 'text' : 'password'"
             name="password"
             placeholder="Contraseña"
-            class="w-full px-5 py-3 rounded-full border bg-gray-50 dark:bg-gray-900 dark:border-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+            class="w-full px-5 py-3 rounded-full border border-gray-300 bg-gray-50 dark:bg-gray-900 dark:border-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
           />
           <ErrorMessage name="password" class="text-red-500 text-sm mt-1" />
           <i
@@ -37,6 +37,13 @@
             @click="togglePassword"
           ></i>
         </div>
+
+        <RecaptchaV2
+          class="pl-8"
+          :sitekey="recaptchaKey"
+          ref="recaptcha"
+          @load-callback="captcha"
+        />
 
         <!-- Botón -->
         <button
@@ -51,19 +58,20 @@
           <span v-else-if="blockMessageShown">Ya puedes intentar iniciar sesión nuevamente</span>
           <span v-else>Iniciar Sesión</span>
         </button>
-        <RecaptchaV2 class="pl-8" :sitekey=recaptchaKey ref="recaptcha" @load-callback="captcha"/>
       </Form>
 
       <p v-if="errorMessage" class="text-red-500 text-center mt-2">{{ errorMessage }}</p>
 
       <div class="flex justify-between items-center mt-4">
-        <a href="#" class="text-sm text-blue-500 hover:underline">¿Olvidaste tu contraseña?</a>
-        <router-link
-          to="/register"
-          class="text-sm text-gray-600 dark:text-gray-300 hover:underline"
-        >
-          Crear una cuenta
-        </router-link>
+        <p class="text-sm text-gray-600 dark:text-gray-300 text-right">
+          ¿No tienes cuenta?
+          <router-link
+            to="/register"
+            class="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+          >
+            Regístrate
+          </router-link>
+        </p>
       </div>
 
       <div class="mt-6 flex items-center justify-center space-x-3">
@@ -72,21 +80,26 @@
         <span class="h-px w-16 bg-gray-400"></span>
       </div>
 
-      <div class="flex justify-center mt-4">
+      <div class="flex justify-center mt-6">
         <button
-          class="p-3 bg-white dark:bg-gray-700 shadow-md rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-300"
           @click="googleLogin"
+          class="flex items-center gap-3 bg-white dark:bg-gray-700 px-6 py-3 rounded-full shadow-lg border border-gray-300 dark:border-gray-600 hover:shadow-xl hover:scale-105 transition-all duration-300"
         >
-          <i class="fab fa-google text-red-500 text-lg"></i>
+          <i class="fab fa-google text-red-500 text-xl"></i>
+          <span class="text-gray-800 dark:text-white font-semibold"
+            >Inicio de sesión con Google</span
+          >
         </button>
       </div>
 
-      <button
-        @click="goToHome"
-        class="mt-6 w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
-      >
-        <i class="fas fa-arrow-left"></i> Volver al inicio
-      </button>
+      <div class="flex justify-center">
+        <button
+          @click="goToHome"
+          class="mt-6 w-[25%] bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+        >
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -99,7 +112,7 @@ import { signInWithGoogle } from '@/firebaseConfig'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 import * as yup from 'yup'
 import DOMPurify from 'dompurify'
-import { RecaptchaV2 } from "vue3-recaptcha-v2";
+import { RecaptchaV2 } from 'vue3-recaptcha-v2'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -117,9 +130,8 @@ const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY // Obtiene la clave
 const recaptchaToken = ref()
 
 const captcha = (resCaptcha) => {
-  console.log("Token de reCAPTCHA obtenido:", resCaptcha);
-      recaptchaToken.value = resCaptcha; // Guarda el token
-      
+  console.log('Token de reCAPTCHA obtenido:', resCaptcha)
+  recaptchaToken.value = resCaptcha // Guarda el token
 }
 
 // Esquema de validación con sanitización
@@ -239,10 +251,10 @@ const goToHome = () => {
 // Verificar bloqueo al montar
 onMounted(() => {
   if (blockUntil.value) updateBlockState()
-  const script = document.createElement('script');
-  script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaKey}`;
-  script.async = true;
-  script.defer = true;
-  document.head.appendChild(script);
+  const script = document.createElement('script')
+  script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaKey}`
+  script.async = true
+  script.defer = true
+  document.head.appendChild(script)
 })
 </script>

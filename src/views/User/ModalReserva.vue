@@ -8,7 +8,9 @@
 
         <!-- Número de personas -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Número de personas</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Número de personas
+          </label>
           <input
             v-model="reserva.numeroPersonas"
             type="number"
@@ -20,7 +22,9 @@
 
         <!-- Fecha -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Selecciona una fecha</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Selecciona una fecha
+          </label>
           <input
             v-model="fechaSeleccionada"
             type="date"
@@ -31,7 +35,9 @@
 
         <!-- Horarios -->
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Selecciona un horario</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Selecciona un horario
+          </label>
           <select
             v-model="horarioSeleccionado"
             class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -61,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { useReservaStore } from '@/stores/reservaStore'
 import { useAuthStore } from '@/stores/authStore'
 import { reservaService } from '@/services/reservaService'
@@ -82,13 +88,19 @@ const reserva = ref({
   mesaId: props.mesa.mesaId,
   usuarioId: authStore.usuarioId || 0,
   fechaReserva: '',
-  numeroPersonas: 1,
+  numeroPersonas: 1
 })
 
+// Fecha seleccionada en el <input type="date">
 const fechaSeleccionada = ref('')
+
+// Lista de horarios que nos da el backend (cada media hora)
 const horariosDisponibles = ref<string[]>([])
+
+// Horario elegido en <select>
 const horarioSeleccionado = ref('')
 
+// 🎯 1) Cada vez que cambie la fecha, pedimos disponibilidad
 watch(fechaSeleccionada, async (nuevaFecha) => {
   try {
     if (!nuevaFecha) {
@@ -96,10 +108,12 @@ watch(fechaSeleccionada, async (nuevaFecha) => {
       return
     }
 
-    const fechaFormateada = new Date(nuevaFecha).toLocaleDateString('en-US')
+    // Para evitar ambigüedades de cultura, enviar en formato ISO (YYYY-MM-DD)
+    const fechaFormateada = new Date(nuevaFecha).toISOString().split('T')[0]
+
     horariosDisponibles.value = await reservaService.obtenerDisponibilidad(
       props.mesa.mesaId,
-      fechaFormateada,
+      fechaFormateada
     )
   } catch (error) {
     console.error('Error al obtener disponibilidad', error)
@@ -107,13 +121,13 @@ watch(fechaSeleccionada, async (nuevaFecha) => {
   }
 })
 
+// 🎯 2) Cuando el usuario elige un horario, formamos fechaReserva en formato ISO
 watch(horarioSeleccionado, (hora) => {
   if (hora && fechaSeleccionada.value) {
     reserva.value.fechaReserva = `${fechaSeleccionada.value}T${hora}`
   }
 })
 
-// ✅ Confirmar reserva con loading + redirección
 const confirmarReserva = async () => {
   try {
     if (!reserva.value.fechaReserva || !horarioSeleccionado.value) {
@@ -121,7 +135,6 @@ const confirmarReserva = async () => {
       return
     }
 
-    // 🔄 Mostrar loading mientras se procesa
     Swal.fire({
       title: 'Procesando reserva...',
       text: 'Por favor espera un momento.',
@@ -130,21 +143,19 @@ const confirmarReserva = async () => {
       showConfirmButton: false,
       didOpen: () => {
         Swal.showLoading()
-      },
+      }
     })
 
     await reservaStore.crearReserva(reserva.value)
 
-    // ✅ Confirmación
     Swal.fire({
       icon: 'success',
       title: '¡Reserva confirmada!',
       text: 'Serás redirigido a tu panel de usuario.',
       timer: 1800,
-      showConfirmButton: false,
+      showConfirmButton: false
     })
 
-    // 🔁 Esperar 1.8 segundos antes de redirigir
     setTimeout(() => {
       emit('reserva-exitosa')
       emit('cerrar')
